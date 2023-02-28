@@ -218,7 +218,7 @@ test <- both$`GDP per capita (constant 2015 US$)`
 test
 
 
-# This finally works.But need to save it to the dataset somehow.
+# This finally works.But need to save it to the dataset somehow and then turn it into a loop... Can add other columns to the list.
 filter(wb_gbd_wide, wb_gbd_wide$Country == "Aruba" & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex != "Both") %>% replace_na(list(`GDP per capita (constant 2015 US$)`= test))
 
 
@@ -234,7 +234,7 @@ wb_gbd_wide %>%
 
 
 
-# Now trying with loop
+# Now trying with loop to do it for each country --> doesn't work yet.
 
 
 for (x in countries_wb_gbd) {
@@ -244,16 +244,6 @@ for (x in countries_wb_gbd) {
 
 
 
-
-
-wb_gbd_wide %>% group_by(wb_gbd_wide$Country) %>% group_by(wb_gbd_wide$Year) %>% mutate()
-
-
-
-test2 <-filter(wb_gbd_wide, wb_gbd_wide$Country == "Germany" & wb_gbd_wide$Year == "2021")
-test2$GDP
-
-wb_gbd_wide
 
 
 
