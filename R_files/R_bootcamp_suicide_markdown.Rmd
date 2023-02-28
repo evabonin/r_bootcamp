@@ -1,0 +1,209 @@
+---
+title: "R bootcamp - suicide"
+author: "Maha & Eva"
+date: "Last edited `r format(Sys.time(), '%A %d/%m/%Y')`"
+output: 
+  html_document:
+    toc: true
+    number_sections: true
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r data, include = FALSE}
+
+# Code chunk named "data". Include all libraries to be loaded here.
+
+library(wbstats)
+library(dplyr)
+library(reshape)
+library(tidyr)
+library(countrycode)
+library(stringr)
+
+
+```
+
+
+# Introduction
+
+# Data sources
+
+[World Bank](https://databank.worldbank.org/reports.aspx?source=2&series=SH.STA.SUIC.P5&country=#)
+
+[Global Burden of Disease study](https://ghdx.healthdata.org/gbd-2019)
+
+
+# Pre-processing
+
+## Merging data files.
+
+```{r merge, include=FALSE}
+world_bank <- wb_data(country = "countries_only",
+                      indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.MKTP.KD" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
+                      mrv = 5,
+                      gapfill = TRUE) %>% 
+  filter(date >= 2000)
+
+
+varnames <- c("ISO2C", "ISO3C", "Country", "Date", "GDP (constant 2015 US$)", "GDP per capita (constant 2015 US$)", "Compulsory education, duration (years)" , 
+              "Suicide mortality rate (per 100,000 population) female", "Suicide mortality rate (per 100,000 population) male", "Suicide mortality rate (per 100,000 population)", 
+              "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) female" ,   "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) male" , 
+              "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)" ,
+              "Unemployment, total (% of total labor force) (modeled ILO estimate) female", "Unemployment, total (% of total labor force) (modeled ILO estimate) male",
+              "Unemployment, total (% of total labor force) (modeled ILO estimate)", "Total population")
+
+
+colnames(world_bank) <- varnames
+
+
+#world_bank_long <- melt(world_bank, id=c("country","iso3c", "date"), variable_name = "indicator")
+
+
+wb_long <- world_bank %>%
+  pivot_longer(cols = !c(Country, ISO3C, ISO2C, Date),
+               names_to = "Indicator",
+               values_to = "Value"
+               )
+
+
+# Creating gender column in WB data
+
+wb_long <- wb_long %>%
+  mutate(Sex = case_when(
+    str_detect(Indicator, "female") ~ "Female",
+    str_detect(Indicator, "male") ~ "Male"),
+    Sex = ifelse(is.na(Sex), "Both", Sex))
+
+# Remove "male" and "female" from indicator descriptions
+
+wb_long$Indicator <- gsub(" male","",as.character(wb_long$Indicator))
+wb_long$Indicator <- gsub(" female","",as.character(wb_long$Indicator))
+
+# dropping ISO2C column
+wb_long <- subset(wb_long, select = -c(ISO2C))
+
+
+
+
+### GBD dataset ###
+
+
+# Loading GBD data
+
+gbd <- read.table("../data/gbd/gbd.csv", header = TRUE, sep = ",", na.strings = "..")
+
+## Dropping columns we don't need
+
+gbd <- gbd[, -c(1, 2, 3, 5, 7, 8, 9, 11, 12, 15, 16)]
+
+
+# insert column with country codes
+# converting country names to world bank destination coding scheme using countrycode library. target var is ISO3C
+
+gbd <- gbd %>%
+  mutate(ISO3C = countrycode(location_name,"country.name", "wb"))
+
+#check to see if there are any cases missing in ISO3C
+
+filter(gbd, is.na(ISO3C))
+
+# There are a few missing, but will deal with this later
+
+
+# Renaming columns
+
+
+gbd_oldnames <- colnames(gbd)
+gbd_oldnames
+gbd_newnames <- c("Country", "Sex", "Indicator", "Date", "Value", "ISO3C" )
+colnames(gbd) <- gbd_newnames
+
+
+
+# MERGING DATASETS
+wb_gbd_long <- rbind(wb_long, gbd)
+
+
+
+# Creating wide version of wb_gbd
+
+wb_gbd_wide <- wb_gbd_long %>%
+  pivot_wider(names_from = "Indicator",
+               values_from = "Value"
+  )
+
+
+```
+
+```{r wb_long, echo=FALSE}
+
+
+
+
+```
+
+
+
+* Missing Values: Identify missing values and decide on a strategy for handling them, such as replacing them with the mean, median, or mode, or removing the rows or columns with missing values.
+    + Use the is.na() function to identify missing values.
+    + Use the mean(), median(), or mode() functions to replace missing values with the mean, median, or mode.
+    + Use the na.omit() function to remove rows with missing values.
+* Outliers: Detect outliers and decide on a strategy for handling them, such as replacing them with the mean, median, or mode, or removing the outliers.
+    + Use the boxplot() function to visualize outliers.
+    + Use the mean(), median(), or mode() functions to replace outliers with the mean, median, or mode.
+    + Use the subset() function to remove outliers.
+* Duplicates: Identify and remove duplicates from the data.
+    + Use the duplicated() function to identify duplicates.
+    + Use the unique() function to remove duplicates.
+* Inconsistent Data: Identify and correct inconsistent data, such as typos, mislabeled categories, and incorrect data types.
+    + Use the unique() function to identify inconsistent data.
+    + Use the ifelse() function to correct inconsistent data.
+* Data Transformation: Transform variables as needed, such as converting categorical variables into dummy variables (0 or 1), scaling numeric variables, and encoding date and time variables.
+    + Use the dummyVars() function from the caret package to convert categorical variables into dummy variables.
+    + Use the scale() function to scale numeric variables.
+    + Use the as.Date() function to convert date variables.
+* Data Validation: Validate the data by comparing it with external sources or using statistical tests to ensure the data is accurate and reliable.
+    + Use the validate() function from the validate package to validate the data.
+    + Use statistical tests, such as the t.test() function, to validate the data.
+
+# Exploratory data analysis
+
+* Bar Plots: To compare the number of suicide deaths across different demographic or geographical categories.
+* Line Plots: To show changes in the number of suicide deaths over time or across different geographic locations.
+* Heat Maps: To show geographical variations in the number of suicide deaths.
+* Scatter Plots: To identify any relationships or correlations between different variables, such as age and suicide deaths.
+* Box Plots: To show the distribution of values for each variable, including median, quartiles, and outliers.
+* Density Plots: To show the distribution of values for each variable, and to help identify any patterns in the data.
+* Time Series Plots: To show trends and patterns in the number of suicide deaths over time.
+ 
+The specific visualization we are going to choose will depend on the questions we want to answer and the characteristics of our data 
+
+
+
+
+# Model
+Regression?
+
+# Special chapter
+Heat map or shiny R
+```{r heat_map, echo = FALSE}
+
+#png("map.png",width=800,height=800,units="px")
+df <- wb_gbd_long %>% 
+    filter(Year == 2019) %>% 
+    filter(Series.Code == "SH.STA.SUIC.P5")
+sPDF <- joinCountryData2Map(df, joinCode = "ISO3", nameJoinColumn = "Country.Code", verbose = FALSE)
+par(mai=c(0,0,0.2,0),xaxs="i",yaxs="i")
+mapCountryData(sPDF, nameColumnToPlot="value")
+#dev.off()
+
+```
+
+
+# Conclusions
+
