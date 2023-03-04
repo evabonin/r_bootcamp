@@ -13,53 +13,70 @@ library(stringr)
 library(imputeTS)
 library(writexl)
 library(foreach)
+library(data.table)
+# apply_labels
+library(expss)
 
 
-
+# Using data from 2017 onwards because that seems to avoid a lot of issues around missing values on the economic indicators.
 
 world_bank <- wb_data(country = "countries_only",
-                      indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.MKTP.KD" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
+                      indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
                       mrv = 5,
                       gapfill = TRUE) %>% 
-  filter(date >= 2000)
+  filter(date >= 2017)
 
 
-varnames <- c("ISO2C", "ISO3C", "Country", "Year", "GDP (constant 2015 US$)", "GDP per capita (constant 2015 US$)", "Compulsory education, duration (years)" , 
-              "Suicide mortality rate (per 100,000 population) female", "Suicide mortality rate (per 100,000 population) male", "Suicide mortality rate (per 100,000 population)", 
-              "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) female" ,   "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) male" , 
-              "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)" ,
-              "Unemployment, total (% of total labor force) (modeled ILO estimate) female", "Unemployment, total (% of total labor force) (modeled ILO estimate) male",
-              "Unemployment, total (% of total labor force) (modeled ILO estimate)", "Total population")
-
-
+varnames <- c("iso2c", "iso3c", "country", "year", "gdp_pc", "edu", "sui_female", "sui_male", "sui", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
 colnames(world_bank) <- varnames
+# world_bank = apply_labels(world_bank,
+#                           iso2c = "ISO2C", 
+#                           iso3c = "ISO3C", 
+#                           country = "Country", 
+#                           year = "Year", 
+#                           gdp_pc = "GDP per capita (constant 2015 US$)", 
+#                           edu = "Compulsory education, duration (years)",
+#                           sui_female = "Suicide mortality rate (per 100,000 population) female", 
+#                           sui_male = "Suicide mortality rate (per 100,000 population) male", 
+#                           sui = "Suicide mortality rate (per 100,000 population)", 
+#                           unem_y_female = "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) female", 
+#                           unem_y_male = "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate) male",
+#                           unem_y = "Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)" ,
+#                           unem_t_female = "Unemployment, total (% of total labor force) (modeled ILO estimate) female", 
+#                           unem_t_male = "Unemployment, total (% of total labor force) (modeled ILO estimate) male",
+#                           unem_t = "Unemployment, total (% of total labor force) (modeled ILO estimate)", 
+#                           pop_t = "Total population")
+
+
+
 
 
 #world_bank_long <- melt(world_bank, id=c("country","iso3c", "date"), variable_name = "indicator")
 
 
 wb_long <- world_bank %>%
-  pivot_longer(cols = !c(Country, ISO3C, ISO2C, Year),
-               names_to = "Indicator",
-               values_to = "Value"
+  pivot_longer(cols = !c(country, iso3c, iso2c, year),
+               names_to = "indicator",
+               values_to = "value"
                )
+
 wb_long[wb_long == 'NULL'] <- NA
 
 # Creating gender column in WB data
 
 wb_long <- wb_long %>%
-  mutate(Sex = case_when(
-    str_detect(Indicator, "female") ~ "Female",
-    str_detect(Indicator, "male") ~ "Male"),
-    Sex = ifelse(is.na(Sex), "Both", Sex))
+  mutate(sex = case_when(
+    str_detect(indicator, "female") ~ "Female",
+    str_detect(indicator, "male") ~ "Male"),
+    sex = ifelse(is.na(sex), "Both", sex))
 
 # Remove "male" and "female" from indicator descriptions
 
-wb_long$Indicator <- gsub(" male","",as.character(wb_long$Indicator))
-wb_long$Indicator <- gsub(" female","",as.character(wb_long$Indicator))
+wb_long$indicator <- gsub("_male","",as.character(wb_long$indicator))
+wb_long$indicator <- gsub("_female","",as.character(wb_long$indicator))
 
-# dropping ISO2C column
-wb_long <- subset(wb_long, select = -c(ISO2C))
+# dropping ISO2C column; pretty sure there's an easier way.
+wb_long <- subset(wb_long, select = -c(iso2c))
 
 
 
@@ -82,24 +99,38 @@ gbd <- gbd[, -c(1, 2, 3, 5, 7, 8, 9, 11, 12, 15, 16)]
 # converting country names to world bank destination coding scheme using countrycode library. target var is ISO3C
 
 gbd <- gbd %>%
-  mutate(ISO3C = countrycode(location_name,"country.name", "wb"))
+  mutate(iso3c = countrycode(location_name,"country.name", "wb"))
 
+# Warning message:
+#   There was 1 warning in `mutate()`.
+# ℹ In argument: `ISO3C = countrycode(location_name, "country.name", "wb")`.
+# Caused by warning in `countrycode_convert()`:
+#   ! Some values were not matched unambiguously: Cook Islands, Niue, Tokelau, Turkiye 
 
+# Manually adding ISO country code for these:
+gbd$iso3c[gbd$location_name == "Cook Islands"] <- "COK"
+gbd$iso3c[gbd$location_name == "Niue"] <- "NIU"
+gbd$iso3c[gbd$location_name == "Tokelau"] <- "TKL"
+gbd$iso3c[gbd$location_name == "Turkiye"] <- "TUR"
 
 #check to see if there are any cases missing in ISO3C
+filter(gbd, is.na(iso3c))
+# is now complete
 
-filter(gbd, is.na(ISO3C))
 
-# Cook Islands self harm
-# Tokelau depressive disorders
-# Niue Depressive disorders
-
-# There are a few missing, but will deal with this later
-
+# Drop data before 2017 (although this is a shame)
+gbd <- gbd[gbd$year >= 2017, ]
 
 # Dropping rows relating to sexual voilence because thta appears to be zero throughout.
-
 gbd <- gbd[gbd$cause_name != "Sexual violence", ] 
+
+
+
+
+
+
+
+
 
 
 
@@ -108,7 +139,7 @@ gbd <- gbd[gbd$cause_name != "Sexual violence", ]
 
 gbd_oldnames <- colnames(gbd)
 gbd_oldnames
-gbd_newnames <- c("Country", "Sex", "Indicator", "Year", "Value", "ISO3C" )
+gbd_newnames <- c("country", "sex", "indicator", "year", "value", "iso3c" )
 colnames(gbd) <- gbd_newnames
 
 
@@ -120,8 +151,8 @@ wb_gbd_long[wb_gbd_long == 'NULL'] <- NA
 # Creating wide version of wb_gbd
 
 wb_gbd_wide <- wb_gbd_long %>%
-  pivot_wider(names_from = "Indicator",
-               values_from = "Value"
+  pivot_wider(names_from = "indicator",
+               values_from = "value"
   )
 
 # wb_gbd_long %>%
@@ -132,7 +163,7 @@ wb_gbd_wide <- wb_gbd_long %>%
 
 # Checking country names for combined dataset as some variance in spelling was found:
 
-countries_wb_gbd <- as.list(unique(wb_gbd_wide[c("Country")]))
+countries_wb_gbd <- as.list(unique(wb_gbd_wide[c("country")]))
 countries_wb_gbd <- lapply(countries_wb_gbd, sort, decreasing = FALSE)
 countries_wb_gbd <- as.data.frame(countries_wb_gbd)
 
@@ -202,56 +233,99 @@ write_xlsx(countries_wb_gbd, "../outputs/countries_combined.xlsx")
 summary(wb_gbd_wide)
 
 
-# Unique values for Year variable --> will be used for filtering.
+# Unique values for Year variable --> will be used for filtering and looping.
 
-years <- as.list(unique(wb_gbd_wide[c("Year")]))
+years <- as.list(unique(wb_gbd_wide[c("year")]))
 years <- lapply(years, sort, decreasing = FALSE)
 
-# Imputing missing values
+# Imputing missing values - My attempt
 
 # Considerations for imputation:
 # - GDP, GDP / capita, compulsory education, total population: same value for male / female as overall. Can use na_mean from imputeTS package.
 # - Then, for all vars: Missing years --> interpolation
+# 
+# both <- filter(wb_gbd_wide, wb_gbd_wide$Country == "Aruba" & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex == "Both")
+# test <- both$`GDP per capita (constant 2015 US$)`
+# test
+# 
+# 
+# # This finally works.But need to save it to the dataset somehow and then turn it into a loop... Can add other columns to the list.
+# filter(wb_gbd_wide, wb_gbd_wide$Country == "Aruba" & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex != "Both") %>% replace_na(list(`GDP per capita (constant 2015 US$)`= test))
+# 
+# 
+# # Another attempt, there seems to be a typo around line 230 but I don't know what it is.
+# 
+# wb_gbd_wide %>%
+#   group_by(wb_gbd_wide$Country) %>%
+#   mutate(
+#     wb_gbd_wide$`GDP (constant 2015 US$)` = impute.mean(wb_gbd_wide$`GDP (constant 2015 US$)`)
+#   )
 
-both <- filter(wb_gbd_wide, wb_gbd_wide$Country == "Aruba" & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex == "Both")
-test <- both$`GDP per capita (constant 2015 US$)`
-test
-
-
-# This finally works.But need to save it to the dataset somehow and then turn it into a loop... Can add other columns to the list.
-filter(wb_gbd_wide, wb_gbd_wide$Country == "Aruba" & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex != "Both") %>% replace_na(list(`GDP per capita (constant 2015 US$)`= test))
-
-
-# Another attempt, there seems to be a typo around line 230 but I don't know what it is.
-
-wb_gbd_wide %>%
-  group_by(wb_gbd_wide$Country) %>%
-  mutate(
-    wb_gbd_wide$`GDP (constant 2015 US$)` = impute.mean(wb_gbd_wide$`GDP (constant 2015 US$)`)
-  )
-
-
-
-
-
-# Now trying with loop to do it for each country --> doesn't work yet.
-
-
-for (x in countries_wb_gbd) {
-  #print(x)
-  x <- filter(wb_gbd_wide, wb_gbd_wide$Country == x & wb_gbd_wide$Year == "2017" & wb_gbd_wide$Sex != "Both")
-}
+# Maybe check this approach: https://stackoverflow.com/questions/71756025/impute-missing-values-within-each-group-based-on-an-equation-in-r
 
 
 
+# Imputation using approach by Claude
+
+
+## Prepare second data set
+wb_gbd_wide.both <- wb_gbd_wide %>% 
+  filter(sex == "Both") %>% 
+  select(!sex)
+
+## Join the two data sets because you have to make sure that contry and year
+## are correctly merged. 
+wb_gbd_wide.tmp2 <- 
+  left_join(x = wb_gbd_wide, y = wb_gbd_wide.both, 
+            by = c("country", "year"),
+            suffix = c("", ".y"))
+
+
+### finally got this working
+wb_gbd_wide <- wb_gbd_wide.tmp2 %>% 
+  mutate(sui = coalesce(sui, sui.y),
+         gdp_pc = coalesce(gdp_pc, gdp_pc.y), 
+         edu = coalesce(edu, edu.y), 
+         pop_t = coalesce(pop_t, pop_t.y))
+         
+         
+# remove columns with .y suffix
+
+columns_to_remove <- grep(".y", names(wb_gbd_wide))
+wb_gbd_wide <- wb_gbd_wide[,-columns_to_remove]
+
+
+# Now to replace only the missing values with the filled values...
+
+  
+         
+#https://stackoverflow.com/questions/37975872/how-to-use-mutate-on-list
 
 
 
 
 
+# Not needed for this project but took me a while to figure out this loop.
+# # original column names
+# varnames <- as.list(colnames(wb_gbd_wide))
+# 
+# #varnames 
+# 
+# varnames.y <- list()
+# 
+# for (i in varnames) {
+#   y <- paste0(i,".y")
+#   #print(i)
+#   print(y)
+#   varnames.y <- append(varnames.y, y)
+# }
 
 
 
-
+# This is the wrong thing to do!
+# # Removing redundant columns
+# wb_gbd_wide <- wb_gbd_wide.tmp2[-c(5:16)]
+# 
+# names(wb_gbd_wide) <- sapply(strsplit(names(wb_gbd_wide), ".y"), `[[`, 1)
 
 
