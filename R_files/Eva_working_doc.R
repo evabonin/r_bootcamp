@@ -17,6 +17,11 @@ library(data.table)
 # apply_labels
 library(expss)
 
+# Visualising:
+library(tidyverse)
+library(naniar)
+library(ggplot2)
+
 
 # Using data from 2017 onwards because that seems to avoid a lot of issues around missing values on the economic indicators.
 
@@ -29,6 +34,7 @@ world_bank <- wb_data(country = "countries_only",
 
 varnames <- c("iso2c", "iso3c", "country", "year", "gdp_pc", "edu", "sui_female", "sui_male", "sui", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
 colnames(world_bank) <- varnames
+
 # world_bank = apply_labels(world_bank,
 #                           iso2c = "ISO2C", 
 #                           iso3c = "ISO3C", 
@@ -127,13 +133,6 @@ gbd <- gbd[gbd$cause_name != "Sexual violence", ]
 
 
 
-
-
-
-
-
-
-
 # Renaming columns
 
 
@@ -143,9 +142,20 @@ gbd_newnames <- c("country", "sex", "indicator", "year", "value", "iso3c" )
 colnames(gbd) <- gbd_newnames
 
 
+
+# Adding in continent:
+
+continent <- read.csv("../data/continents.csv") 
+
+
+
+
 # MERGING DATASETS
 wb_gbd_long <- rbind(wb_long, gbd)
 wb_gbd_long[wb_gbd_long == 'NULL'] <- NA
+
+
+
 
 
 # Creating wide version of wb_gbd
@@ -154,6 +164,13 @@ wb_gbd_wide <- wb_gbd_long %>%
   pivot_wider(names_from = "indicator",
                values_from = "value"
   )
+
+
+wb_gbd_wide <- left_join(wb_gbd_wide, continent, by = "iso3c")
+
+
+
+
 
 # wb_gbd_long %>%
 #   dplyr::group_by(ISO3C, Country, Year, Sex, Indicator) %>%
@@ -166,9 +183,6 @@ wb_gbd_wide <- wb_gbd_long %>%
 countries_wb_gbd <- as.list(unique(wb_gbd_wide[c("country")]))
 countries_wb_gbd <- lapply(countries_wb_gbd, sort, decreasing = FALSE)
 countries_wb_gbd <- as.data.frame(countries_wb_gbd)
-
-# This list will be later to filter the data for imputation
-countries_wb_gbd
 
 write_xlsx(countries_wb_gbd, "../outputs/countries_combined.xlsx")
 
@@ -233,10 +247,22 @@ write_xlsx(countries_wb_gbd, "../outputs/countries_combined.xlsx")
 summary(wb_gbd_wide)
 
 
+# renaming vars so all are in line
+
+varnames_old <- colnames(wb_gbd_wide)
+varnames_old
+varnames_new <- c("iso3c", "country", "year","sex","gdp_pc","edu","sui","unem_y","unem_t","pop_t","alc", "drug","depr","sh", "continent", "region")
+colnames(wb_gbd_wide) <- varnames_new
+
+
+
+
 # Unique values for Year variable --> will be used for filtering and looping.
 
-years <- as.list(unique(wb_gbd_wide[c("year")]))
-years <- lapply(years, sort, decreasing = FALSE)
+#years <- as.list(unique(wb_gbd_wide[c("year")]))
+#years <- lapply(years, sort, decreasing = FALSE)
+
+
 
 # Imputing missing values - My attempt
 
@@ -281,7 +307,7 @@ wb_gbd_wide.tmp2 <-
             suffix = c("", ".y"))
 
 
-### finally got this working
+### finally got this working, I'm sure there is a more elegant way of doing this.
 wb_gbd_wide <- wb_gbd_wide.tmp2 %>% 
   mutate(sui = coalesce(sui, sui.y),
          gdp_pc = coalesce(gdp_pc, gdp_pc.y), 
@@ -291,11 +317,254 @@ wb_gbd_wide <- wb_gbd_wide.tmp2 %>%
          
 # remove columns with .y suffix
 
-columns_to_remove <- grep(".y", names(wb_gbd_wide))
+columns_to_remove <- grep("\\.y", names(wb_gbd_wide))
 wb_gbd_wide <- wb_gbd_wide[,-columns_to_remove]
 
 
-# Now to replace only the missing values with the filled values...
+# list of countries
+countries_wb_gbd <- as.list(unique(wb_gbd_wide[c("country")]))
+
+length(countries_wb_gbd[[1]])
+# we have 230 countries
+
+
+# Counting missing values by country
+
+na_count <- wb_gbd_wide %>%
+  group_by(country) %>%
+  dplyr::summarize(count_na = sum(is.na(sui)))
+
+na_count
+print(na_count, n=230)
+
+# barplot(na_count$count_na, names.arg = na_count$country, xlab = "Country", ylab = "Count of NA Values", main = "Count of NA Values by Country")
+
+# count the occurrences of each value in count_na[2]
+counts <- table(na_count$count_na)
+print(counts)
+
+
+### THIS ONE FOR REPORT
+
+# create a bar plot of the counts
+barplot(counts, xlab = "Number of NA Values", ylab = "Count", main = "Counts of NA Values")
+
+# Which countries are completely missing --> remove from dataset
+# subset na_count to include only rows where count_na[2] is 15
+subset15 <- na_count[na_count$count_na == 15, ]
+
+# print the values of count_na[1] in the subset
+print(subset15, n=34)
+
+
+# Which countries are missing missing?
+# subset na_count to include only rows where count_na[2] is 15
+subset15 <- na_count[na_count$count_na == 15, ]
+
+# print the values of count_na[1] in the subset
+print(subset15)
+
+
+
+# Which countries are missing 9 values?
+# subset na_count to include only rows where count_na[2] is 15
+subset9 <- na_count[na_count$count_na == 9, ]
+
+# print the values of count_na[1] in the subset
+print(subset9, n=34)
+
+
+# Exploring the subset9 using code like
+# print(filter(df_by_country, country == "Cook Islands"))
+# revealed that only three years are available for these countries, and all the suicide data are missing.
+# This is because the countries were only in the gdb dataset, not in the WB dataset.
+
+# remove countries with no data on suicide rates
+
+# create a vector of values to exclude
+exclude_vec <- as.character(c(subset15[[1]], subset9[[1]]))
+exclude_vec
+# subset the data frame to exclude rows where the value in the column is in the exclude_vec
+wb_gbd_wide <- subset(wb_gbd_wide, !country %in% exclude_vec)
+
+test_countries <- as.list(unique(wb_gbd_wide[c("country")]))
+length(test_countries[[1]])
+# we have 183 countries
+
+
+
+
+
+### MISSING VALUES IN TIME SERIES
+
+
+# Visualising:
+
+library(tidyverse)
+library(naniar)
+library(ggplot2)
+
+# # plot missing data by country and sex --> too many plots
+# wb_gbd_wide %>%
+#   group_by(country, sex) %>%
+#   ggplot(aes(x = year, y = sui)) +
+#   geom_line(aes(color = is.na(sui))) +
+#   facet_grid(cols = vars(country), rows = vars(sex)) +
+#   scale_color_manual(name = "Missing data", values = c("TRUE" = "red", "FALSE" = "black")) +
+#   labs(x = "Year", y = "Suicide rate") +
+#   theme_bw()
+
+
+
+
+library(visdat)
+library(dplyr)
+
+# getting a plot with a pattern of missing data.
+# Note: I used this plot to go back upstream in my code and improve the result by removing countries with missing data on the suicide variable.
+
+
+# Group the data by country
+df_by_country <- wb_gbd_wide %>%
+  group_by(country, sex) %>%
+  arrange(year)
+
+# Create a heatmap of missing data using vis_miss()
+vis_miss(df_by_country)
+
+
+# A Table showing the number of missings per column by country, only for those with missing data.
+library(dplyr)
+# Group by country and summarize missing values in each column
+df_miss <- df_by_country %>% 
+  group_by(country) %>% 
+  summarize_at(vars(-group_cols()), ~sum(is.na(.)))
+
+# Filter only those with missing values
+df_miss_filtered <- df_miss %>% 
+  filter(rowSums(df_miss[, -1]) > 0)
+
+# View the result
+print(df_miss_filtered, n=200)
+
+
+
+library(pheatmap)
+
+# Transpose the data frame so that variables are columns and countries are rows
+df_miss_transposed <- t(df_miss_filtered[, -1])
+
+# Create a heatmap with pheatmap
+pdf("../outputs/heatmap_missings.pdf")
+
+pheatmap(df_miss_transposed, 
+         color = colorRampPalette(c("yellow", "purple"))(100), 
+         cluster_cols = TRUE)
+dev.off()
+
+
+# The heatmap shows the pattern of missing values across the variables and countries. Each row in the heatmap corresponds to a variable, and each column corresponds to a country. The cells in the heatmap are colored according to the proportion of missing values for that variable in that country, with white cells indicating no missing values, and blue cells indicating high proportions of missing values.
+# 
+# Interpreting the heatmap involves looking for patterns in the missing data across the different variables and countries. Here are some general guidelines:
+#   
+#   Look for variables that have a high proportion of missing values across many countries. These variables may be difficult to work with, as they may limit the scope of analysis or introduce bias.
+#   Look for countries that have a high proportion of missing values across many variables. These countries may be underrepresented in the analysis or may require imputation methods to handle the missing data.
+#   Look for patterns of missingness that may be related to other variables or factors. For example, if a country has a high proportion of missing values for income and education variables, it may be an indication of socioeconomic disparities or differences in data collection methods.
+# In general, interpreting missing data can be complex and may require additional information about the variables and countries in question. The heatmap can provide a useful visual summary of the missing data patterns, but it should be used in conjunction with other analyses and considerations.
+
+
+# Replace where it's missing in the series.
+
+
+# https://stackoverflow.com/questions/50648800/ggplot-plotting-timeseries-data-with-missing-values
+# na_locf() from package zoo
+
+library(dplyr)
+library(imputeTS)
+# Impute missing values using median by group (country, sex). There may be a more efficient way of doing this
+df_imputed <- df_by_country %>%
+  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
+         edu = median(edu, na.rm = TRUE),
+         sui = median(sui, na.rm = TRUE),
+         unem_y = median(unem_y, na.rm = TRUE),
+         unem_t = median(unem_t, na.rm = TRUE),
+         pop_t = median(pop_t, na.rm = TRUE),
+         alc = median(alc, na.rm = TRUE),
+         drug = median(drug, na.rm = TRUE),
+         depr = median(depr, na.rm = TRUE),
+         sh = median(sh, na.rm = TRUE))
+
+summary(df_by_country)
+summary(df_imputed)
+
+
+
+
+# This approach isn't all that successful --> imputing median by region
+
+
+df_by_region <- wb_gbd_wide %>%
+  group_by(region, sex) %>%
+  arrange(year)
+
+# Repeating imputation by region Obviously not the correct thing to do!
+
+df_imputed2 <- df_by_region %>%
+  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
+         edu = median(edu, na.rm = TRUE),
+         sui = median(sui, na.rm = TRUE),
+         unem_y = median(unem_y, na.rm = TRUE),
+         unem_t = median(unem_t, na.rm = TRUE),
+         pop_t = median(pop_t, na.rm = TRUE),
+         alc = median(alc, na.rm = TRUE),
+         drug = median(drug, na.rm = TRUE),
+         depr = median(depr, na.rm = TRUE),
+         sh = median(sh, na.rm = TRUE))
+
+summary(df_by_country)
+summary(df_imputed2)
+
+
+# And finally by continent
+
+
+df_by_continent <- wb_gbd_wide %>%
+  group_by(continent, sex) %>%
+  arrange(year)
+
+# Repeating imputation by region Obviously not the correct thing to do!
+
+df_imputed3 <- df_by_continent %>%
+  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
+         edu = median(edu, na.rm = TRUE),
+         sui = median(sui, na.rm = TRUE),
+         unem_y = median(unem_y, na.rm = TRUE),
+         unem_t = median(unem_t, na.rm = TRUE),
+         pop_t = median(pop_t, na.rm = TRUE),
+         alc = median(alc, na.rm = TRUE),
+         drug = median(drug, na.rm = TRUE),
+         depr = median(depr, na.rm = TRUE),
+         sh = median(sh, na.rm = TRUE))
+
+summary(df_by_country)
+summary(df_imputed3)
+
+
+
+
+
+
+
+# This is where I stopped -------------------------------------------------
+
+
+### df_imputed3 now has no missing values!!!! Phew.
+
+# clean up global environment:
+#   # Remove multiple objects from the global environment
+#   rm(my_data, other_data, unused_vector)
+
+
 
   
          
