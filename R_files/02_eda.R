@@ -2,8 +2,50 @@
 
 # Describe data set: summary
 
+summary(suicide_final)
 
-https://r4ds.had.co.nz/exploratory-data-analysis.html
+###################### Creating some data frames for plotting
+
+# Summarise suicide data by country, male and female separately
+
+sui_country <- suicide_final %>% 
+  group_by(country, year1, sex) %>% 
+  summarise(mean_sui=mean(sui),
+            .groups = 'drop')
+print(sui_country, n=50)
+
+# Show countries with the highest suicide rates over time
+sui_country_time <- suicide_final %>% 
+  group_by(country, sex) %>% 
+  summarise(mean_sui=mean(sui),
+            .groups = 'drop')
+sui_country_time
+
+sui_country_time_sorted <- sui_country_time[order(sui_country_time$mean_sui, decreasing = TRUE),]
+print(sui_country_time_sorted, n = 50)
+
+
+
+# Summarise suicide data by continent
+sui_continent <- suicide_final %>% 
+  group_by(continent, sex) %>% 
+  summarise(mean_sui=mean(sui),
+            .groups = 'drop')
+
+sui_continent_sorted <- sui_continent %>%
+  filter(sex == "Both") %>%
+  arrange(desc(mean_sui))
+print(sui_continent_sorted, n=10)
+
+# Heat map to show by country
+
+# Then: Graphs by continent
+
+# Then: Case study Switzerland
+
+
+
+#https://r4ds.had.co.nz/exploratory-data-analysis.html
 
 # Bar Plots / histograms: To compare the number of suicide deaths across different demographic or geographical categories.
 # Calculate by multiplying rates by total population? For male / female (assume 50% of total pop).

@@ -1,36 +1,64 @@
-# Loading WB data from web
-# useful links:
-# https://github.com/gshs-ornl/wbstats
-# https://joenoonan.se/post/country-code-tutorial/
+
+
+
+
+# # Define a vector of package names to check for and install if needed
+# packages <- c("wbstats", "dplyr", "reshape", "tidyr", "countrycode", "tidyverse", "ggplot2", "expss", "writexl", "readxl", "imputeTS")
+# 
+# # Loop over each package and check if it's installed
+# for (package in packages) {
+#   if (!require(package)) {
+#     install.packages(package)
+#   }
+# }
+
+
 
 library(wbstats)
 library(dplyr)
 library(reshape)
 library(tidyr)
 library(countrycode)
-library(stringr)
-library(imputeTS)
-library(writexl)
-library(foreach)
-library(data.table)
-
-# apply_labels
-library(expss)
-
-# Visualising:
 library(tidyverse)
-library(naniar)
 library(ggplot2)
+library(expss)
+library(writexl)
+library(readxl)
+library(imputeTS)
+
+
+
+# library(stringr)
+# library(imputeTS)
+
+# library(foreach)
+# library(data.table)
+# library(naniar)
+
+
+
+
+# Loading WB data from web
+# useful links:
+# https://github.com/gshs-ornl/wbstats
+# https://joenoonan.se/post/country-code-tutorial/
+
 
 
 # Using data from 2017 onwards because that seems to avoid a lot of issues around missing values on the economic indicators.
-
-world_bank2 <- wb_data(country = "countries_only",
-                      indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
-                      mrv = 10,
-                      gapfill = TRUE) # this automatically does interpolation!
+# 
+# world_bank <- wb_data(country = "countries_only",
+#                       indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
+#                       mrv = 10,
+#                       gapfill = TRUE) # this automatically does interpolation!
 #%>% 
  # filter(date >= 2017)
+
+# Saving to Excel because I've had issues accessing the World Bank server
+# write_xlsx(world_bank,"../data/world_bank.xlsx")
+
+
+world_bank <- my_data <- read_excel("../data/world_bank.xlsx", na = "")
 
 
 varnames <- c("iso2c", "iso3c", "country", "year", "gdp_pc", "edu", "sui_female", "sui_male", "sui", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
@@ -351,19 +379,14 @@ print(counts)
 barplot(counts, xlab = "Number of NA Values", ylab = "Count", main = "Counts of NA Values")
 
 # Which countries are completely missing --> remove from dataset
-# subset na_count to include only rows where count_na[2] is 15
-subset15 <- na_count[na_count$count_na == 15, ]
-
-# print the values of count_na[1] in the subset
-print(subset15, n=34)
 
 
 # Which countries are missing missing?
 # subset na_count to include only rows where count_na[2] is 15
-subset15 <- na_count[na_count$count_na == 15, ]
+subset30 <- na_count[na_count$count_na == 30, ]
 
 # print the values of count_na[1] in the subset
-print(subset15)
+print(subset30)
 
 
 
@@ -372,7 +395,7 @@ print(subset15)
 subset9 <- na_count[na_count$count_na == 9, ]
 
 # print the values of count_na[1] in the subset
-print(subset9, n=34)
+print(subset9, n=50)
 
 
 # Exploring the subset9 using code like
@@ -383,7 +406,7 @@ print(subset9, n=34)
 # remove countries with no data on suicide rates
 
 # create a vector of values to exclude
-exclude_vec <- as.character(c(subset15[[1]], subset9[[1]]))
+exclude_vec <- as.character(c(subset30[[1]], subset9[[1]]))
 exclude_vec
 # subset the data frame to exclude rows where the value in the column is in the exclude_vec
 wb_gbd_wide <- subset(wb_gbd_wide, !country %in% exclude_vec)
@@ -434,34 +457,40 @@ df_by_country <- wb_gbd_wide %>%
 vis_miss(df_by_country)
 
 
-# A Table showing the number of missings per column by country, only for those with missing data.
-library(dplyr)
-# Group by country and summarize missing values in each column
-df_miss <- df_by_country %>% 
-  group_by(country) %>% 
-  summarize_at(vars(-group_cols()), ~sum(is.na(.)))
+###############################################################################
+# TRY AND FIX THIS BIT
+###############################################################################
 
-# Filter only those with missing values
-df_miss_filtered <- df_miss %>% 
-  filter(rowSums(df_miss[, -1]) > 0)
-
-# View the result
-print(df_miss_filtered, n=200)
-
-
-
-library(pheatmap)
-
-# Transpose the data frame so that variables are columns and countries are rows
-df_miss_transposed <- t(df_miss_filtered[, -1])
-
-# Create a heatmap with pheatmap
-pdf("../outputs/heatmap_missings.pdf")
-
-pheatmap(df_miss_transposed, 
-         color = colorRampPalette(c("yellow", "purple"))(100), 
-         cluster_cols = TRUE)
-dev.off()
+# 
+# # # A Table showing the number of missings per column by country, only for those with missing data.
+# library(dplyr)
+# 
+# # This was working yesterday...
+# # Group by country and summarize missing values in each column
+# df_miss <- df_by_country %>%
+#   group_by(country) %>%
+#   summarize_at(vars(-group_cols()), ~sum(is.na(.)))
+# 
+# # Filter only those with missing values
+# df_miss_filtered <- df_miss %>%
+#   filter(rowSums(df_miss[, -1]) > 0)
+# 
+# # View the result
+# print(df_miss_filtered, n=250)
+# 
+# 
+# library(pheatmap)
+# 
+# # Transpose the data frame so that variables are columns and countries are rows
+# df_miss_transposed <- t(df_miss_filtered[, -1])
+# 
+# # Create a heatmap with pheatmap
+# pdf("../outputs/heatmap_missings.pdf")
+# 
+# pheatmap(df_miss_transposed, 
+#          color = colorRampPalette(c("yellow", "purple"))(100), 
+#          cluster_cols = TRUE)
+# dev.off()
 
 
 # The heatmap shows the pattern of missing values across the variables and countries. Each row in the heatmap corresponds to a variable, and each column corresponds to a country. The cells in the heatmap are colored according to the proportion of missing values for that variable in that country, with white cells indicating no missing values, and blue cells indicating high proportions of missing values.
@@ -473,6 +502,9 @@ dev.off()
 #   Look for patterns of missingness that may be related to other variables or factors. For example, if a country has a high proportion of missing values for income and education variables, it may be an indication of socioeconomic disparities or differences in data collection methods.
 # In general, interpreting missing data can be complex and may require additional information about the variables and countries in question. The heatmap can provide a useful visual summary of the missing data patterns, but it should be used in conjunction with other analyses and considerations.
 
+
+###############################################################################
+###############################################################################
 
 # Replace where it's missing in the series.
 
@@ -551,6 +583,17 @@ summary(df_by_country)
 summary(df_imputed3)
 
 
+suicide_final <- df_imputed3
+#write_xlsx(df_imputed3,"../data/suicide_final.xlsx")
+
+# Set year variable to date type to allow for time series analysis
+
+library(lubridate)
+
+suicide_final$year1 <- ymd(paste0(suicide_final$year, "-01-01"))
+str(suicide_final$year1)
+
+summary(suicide_final)
 
 
 
