@@ -1,0 +1,13 @@
+name: R_bootcamp_shiny
+title: R_bootcamp_shiny
+username:
+account: evabonin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8540384
+bundleId: 6945093
+url: https://evabonin.shinyapps.io/R_bootcamp_shiny/
+when: 1678527556.16505
+lastSyncTime: 1678527556.16506
+asMultiple: FALSE
+asStatic: FALSE

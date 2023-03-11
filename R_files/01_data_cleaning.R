@@ -121,7 +121,7 @@ wb_long <- subset(wb_long, select = -c(iso2c))
 
 # Loading GBD data
 
-gbd <- read.csv("../data/gbd/gbd_clean.csv", header = TRUE, sep = ",", na.strings = "NA")
+gbd <- read.csv("../data/gbd/gbd_clean.csv", header = TRUE, sep = ",", na.strings = NA)
 
 
 
@@ -337,8 +337,9 @@ wb_gbd_wide.tmp2 <-
 
 
 ### finally got this working, I'm sure there is a more elegant way of doing this.
+# NEed to explicitly include plyr here, otherwise get an error.
 wb_gbd_wide <- wb_gbd_wide.tmp2 %>% 
-  mutate(sui = coalesce(sui, sui.y),
+  plyr::mutate(sui = coalesce(sui, sui.y),
          gdp_pc = coalesce(gdp_pc, gdp_pc.y), 
          edu = coalesce(edu, edu.y), 
          pop_t = coalesce(pop_t, pop_t.y))
@@ -453,6 +454,9 @@ df_by_country <- wb_gbd_wide %>%
   group_by(country, sex) %>%
   arrange(year)
 
+df_by_country
+
+
 # Create a heatmap of missing data using vis_miss()
 vis_miss(df_by_country)
 
@@ -514,76 +518,63 @@ vis_miss(df_by_country)
 
 library(dplyr)
 library(imputeTS)
-# Impute missing values using median by group (country, sex). There may be a more efficient way of doing this
-df_imputed <- df_by_country %>%
-  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
-         edu = median(edu, na.rm = TRUE),
-         sui = median(sui, na.rm = TRUE),
-         unem_y = median(unem_y, na.rm = TRUE),
-         unem_t = median(unem_t, na.rm = TRUE),
-         pop_t = median(pop_t, na.rm = TRUE),
-         alc = median(alc, na.rm = TRUE),
-         drug = median(drug, na.rm = TRUE),
-         depr = median(depr, na.rm = TRUE),
-         sh = median(sh, na.rm = TRUE))
+# # Impute missing values using median by group (country, sex). There may be a more efficient way of doing this
 
-summary(df_by_country)
+library(dplyr)
+library(zoo)
+
+df_imputed <- wb_gbd_wide %>%
+  group_by(country, year) %>%
+  mutate_if(is.numeric, na.aggregate, FUN = median) %>%
+  ungroup()
+
+# Much more sensible result
+filter(wb_gbd_wide, country == "Switzerland")
+filter(df_imputed, country == "Switzerland")
+
 summary(df_imputed)
 
+# And by country only
+
+df_imputed2 <- df_imputed %>%
+  group_by(country) %>%
+  mutate_if(is.numeric, na.aggregate, FUN = median) %>%
+  ungroup()
+
+
+#summary(df_imputed)
+summary(df_imputed2)
+
+filter(df_imputed2, country == "Switzerland")
+print(filter(df_imputed2, region == "Western Europe"), n=100)
+
+wb_gbd_wide %>% filter(region == "Western Europe") %>% summary()
 
 
 
-# This approach isn't all that successful --> imputing median by region
-
-
-df_by_region <- wb_gbd_wide %>%
-  group_by(region, sex) %>%
-  arrange(year)
-
+# This approach isn't that successful for some vars --> imputing median by region
 # Repeating imputation by region Obviously not the correct thing to do!
 
-df_imputed2 <- df_by_region %>%
-  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
-         edu = median(edu, na.rm = TRUE),
-         sui = median(sui, na.rm = TRUE),
-         unem_y = median(unem_y, na.rm = TRUE),
-         unem_t = median(unem_t, na.rm = TRUE),
-         pop_t = median(pop_t, na.rm = TRUE),
-         alc = median(alc, na.rm = TRUE),
-         drug = median(drug, na.rm = TRUE),
-         depr = median(depr, na.rm = TRUE),
-         sh = median(sh, na.rm = TRUE))
+df_imputed3 <- df_imputed2 %>%
+  group_by(region) %>%
+  mutate_if(is.numeric, na.aggregate, FUN = median) %>%
+  ungroup()
 
-summary(df_by_country)
-summary(df_imputed2)
+summary(df_imputed3)
 
 
 # And finally by continent
 
+df_imputed4 <- df_imputed3 %>%
+  group_by(continent) %>%
+  mutate_if(is.numeric, na.aggregate, FUN = median) %>%
+  ungroup()
 
-df_by_continent <- wb_gbd_wide %>%
-  group_by(continent, sex) %>%
-  arrange(year)
-
-# Repeating imputation by region Obviously not the correct thing to do!
-
-df_imputed3 <- df_by_continent %>%
-  mutate(gdp_pc = median(gdp_pc, na.rm = TRUE),
-         edu = median(edu, na.rm = TRUE),
-         sui = median(sui, na.rm = TRUE),
-         unem_y = median(unem_y, na.rm = TRUE),
-         unem_t = median(unem_t, na.rm = TRUE),
-         pop_t = median(pop_t, na.rm = TRUE),
-         alc = median(alc, na.rm = TRUE),
-         drug = median(drug, na.rm = TRUE),
-         depr = median(depr, na.rm = TRUE),
-         sh = median(sh, na.rm = TRUE))
-
-summary(df_by_country)
-summary(df_imputed3)
+summary(df_imputed4)
 
 
-suicide_final <- df_imputed3
+
+suicide_final <- df_imputed4
 #write_xlsx(df_imputed3,"../data/suicide_final.xlsx")
 
 # Set year variable to date type to allow for time series analysis
@@ -592,6 +583,22 @@ library(lubridate)
 
 suicide_final$year1 <- ymd(paste0(suicide_final$year, "-01-01"))
 str(suicide_final$year1)
+
+# Turning country and sex into factor --> don't think this is needed after all, error was caused by something else.
+
+# suicide_final$f_country <- as.factor((suicide_final$country))
+# suicide_final$f_sex <- as.factor((suicide_final$sex))
+# suicide_final$f_continent <- as.factor((suicide_final$continent))
+
+# Adding calculated column: total suicide deaths.
+# Assuming population is 50/50 male / female, which is not true!
+suicide_final <- suicide_final %>%
+  mutate(deaths = case_when(
+    sex %in% c("Male", "Female") ~ sui * pop_t * 0.5,
+    TRUE ~ sui * pop_t
+  ))
+
+
 
 summary(suicide_final)
 
