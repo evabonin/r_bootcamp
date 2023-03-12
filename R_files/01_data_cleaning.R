@@ -64,11 +64,9 @@ library(zoo)
 # world_bank <- wb_data(country = "countries_only",
 #                       indicator = c("SP.POP.TOTL", "SH.STA.SUIC.P5" , "SH.STA.SUIC.FE.P5" , "SH.STA.SUIC.MA.P5" , "SE.COM.DURS" , "NY.GDP.PCAP.KD" , "SL.UEM.1524.ZS" , "SL.UEM.1524.MA.ZS" , "SL.UEM.1524.FE.ZS" , "SL.UEM.TOTL.ZS" , "SL.UEM.TOTL.MA.ZS" , "SL.UEM.TOTL.FE.ZS"),
 #                       mrv = 10,
-#                       gapfill = TRUE) # this automatically does interpolation!
-#%>% 
-# filter(date >= 2017)
-
-# Saving to Excel because I've had issues accessing the World Bank server
+#                       gapfill = TRUE) %>% filter(date >= 2017)
+# 
+# # Saving to Excel because I've had issues accessing the World Bank server
 # write_xlsx(world_bank,"../data/world_bank.xlsx")
 
 world_bank <- read_excel("../data/world_bank.xlsx", na = "")
@@ -152,7 +150,7 @@ filter(gbd, is.na(iso3c))
 
 
 # Drop data before 2017 (although this is a shame)
-#gbd <- gbd[gbd$year <= 2017, ]
+gbd <- gbd[gbd$year >= 2017, ]
 
 # Dropping rows relating to sexual voilence because thta appears to be zero throughout.
 gbd <- gbd[gbd$cause_name != "Sexual violence", ] 
@@ -514,11 +512,6 @@ suicide_final <- suicide_final %>%
     sex %in% c("Male", "Female") ~ sui * pop_t/100000 * 0.5,
     TRUE ~ sui * pop_t/100000
   ))
-
-# Adding columns: longitude and latitude for mapping
-
-suicide_final$lat <- countrycode(suicide_final$iso3c, "iso3c", "latitude")
-suicide_final<- countrycode(suicide_finaliso3c, "iso3c", "longitude")
 
 
 
