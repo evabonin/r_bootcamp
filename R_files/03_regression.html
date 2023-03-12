@@ -108,34 +108,38 @@ hr { border: 1px #ddd dashed; }
 
 summary(suicide_final)
 </code></pre>
-<pre><code>##     iso3c             country               year          sex                gdp_pc            edu              sui         
-##  Length:5490        Length:5490        Min.   :2012   Length:5490        Min.   :   261   Min.   : 5.000   Min.   :  0.000  
-##  Class1:labelled    Class1:labelled    1st Qu.:2014   Class1:labelled    1st Qu.:  1670   1st Qu.: 8.000   1st Qu.:  3.700  
-##  Class2:character   Class2:character   Median :2016   Class2:character   Median :  5267   Median : 9.000   Median :  6.900  
-##  Mode  :character   Mode  :character   Mean   :2016   Mode  :character   Mean   : 12701   Mean   : 9.663   Mean   :  9.942  
-##                                        3rd Qu.:2019                      3rd Qu.: 15126   3rd Qu.:11.000   3rd Qu.: 12.200  
-##                                        Max.   :2021                      Max.   :108351   Max.   :17.000   Max.   :147.800  
-##      unem_y           unem_t           pop_t                alc               drug             depr            sh         
-##  Min.   : 0.194   Min.   : 0.050   Min.   :8.767e+04   Min.   :  62.41   Min.   : 74.78   Min.   :1118   Min.   :  7.218  
-##  1st Qu.: 8.080   1st Qu.: 3.703   1st Qu.:2.664e+06   1st Qu.: 315.08   1st Qu.:152.03   1st Qu.:3078   1st Qu.: 24.766  
-##  Median :14.225   Median : 5.904   Median :9.482e+06   Median : 658.09   Median :192.72   Median :3836   Median : 38.268  
-##  Mean   :17.733   Mean   : 8.020   Mean   :4.090e+07   Mean   : 749.94   Mean   :203.65   Mean   :3972   Mean   : 52.959  
-##  3rd Qu.:24.255   3rd Qu.:10.514   3rd Qu.:3.004e+07   3rd Qu.:1081.77   3rd Qu.:237.72   3rd Qu.:4831   3rd Qu.: 74.908  
-##  Max.   :80.762   Max.   :37.901   Max.   :1.412e+09   Max.   :3678.89   Max.   :600.03   Max.   :9268   Max.   :280.768  
-##   continent            region              year1                deaths         
-##  Length:5490        Length:5490        Min.   :2012-01-01   Min.   :0.000e+00  
-##  Class1:labelled    Class1:labelled    1st Qu.:2014-01-01   1st Qu.:9.905e+06  
-##  Class2:character   Class2:character   Median :2016-07-02   Median :3.958e+07  
-##  Mode  :character   Mode  :character   Mean   :2016-07-02   Mean   :2.582e+08  
-##                                        3rd Qu.:2019-01-01   3rd Qu.:1.376e+08  
-##                                        Max.   :2021-01-01   Max.   :1.823e+10
+<pre><code>##     iso3c             country               year          sex                gdp_pc            edu              sui             unem_y           unem_t           pop_t                alc         
+##  Length:13566       Length:13566       Min.   :2000   Length:13566       Min.   :   261   Min.   : 0.000   Min.   :  0.00   Min.   : 0.194   Min.   : 0.050   Min.   :1.044e+04   Min.   :  52.31  
+##  Class1:labelled    Class1:labelled    1st Qu.:2005   Class1:labelled    1st Qu.:  2128   1st Qu.: 8.000   1st Qu.:  4.30   1st Qu.: 8.880   1st Qu.: 4.054   1st Qu.:1.436e+06   1st Qu.: 287.63  
+##  Class2:character   Class2:character   Median :2011   Class2:character   Median :  6019   Median :10.000   Median :  7.30   Median :14.293   Median : 6.061   Median :8.053e+06   Median : 576.05  
+##  Mode  :character   Mode  :character   Mean   :2011   Mode  :character   Mean   : 14128   Mean   : 9.704   Mean   : 10.15   Mean   :17.320   Mean   : 7.747   Mean   :3.794e+07   Mean   : 744.55  
+##                                        3rd Qu.:2016                      3rd Qu.: 15600   3rd Qu.:11.000   3rd Qu.: 13.25   3rd Qu.:23.000   3rd Qu.: 9.562   3rd Qu.:2.720e+07   3rd Qu.:1087.74  
+##                                        Max.   :2021                      Max.   :204190   Max.   :17.000   Max.   :147.80   Max.   :80.762   Max.   :37.901   Max.   :1.412e+09   Max.   :3678.89  
+##       drug             depr             sh           continent            region              year1                deaths         
+##  Min.   : 68.72   Min.   : 1034   Min.   :  6.791   Length:13566       Length:13566       Min.   :2000-01-01   Min.   :     0.00  
+##  1st Qu.:144.79   1st Qu.: 2711   1st Qu.: 23.832   Class1:labelled    Class1:labelled    1st Qu.:2005-01-01   1st Qu.:    63.64  
+##  Median :194.73   Median : 3642   Median : 39.908   Class2:character   Class2:character   Median :2011-01-01   Median :   354.89  
+##  Mean   :207.38   Mean   : 3869   Mean   : 60.656   Mode  :character   Mode  :character   Mean   :2010-07-10   Mean   :  2453.53  
+##  3rd Qu.:248.73   3rd Qu.: 4747   3rd Qu.: 84.894                                         3rd Qu.:2016-01-01   3rd Qu.:  1163.88  
+##  Max.   :618.78   Max.   :11304   Max.   :883.830                                         Max.   :2021-01-01   Max.   :182251.67
 </code></pre>
 <pre><code class="language-r">library(fixest)
-library(modelsummary)
+</code></pre>
+<pre><code>## 
+## Attaching package: 'fixest'
+</code></pre>
+<pre><code>## The following object is masked from 'package:terra':
+## 
+##     panel
+</code></pre>
+<pre><code class="language-r">library(modelsummary)
 library(stats)
 
 library(sjPlot)
-library(sjlabelled)
+</code></pre>
+<pre><code>## Learn more about sjPlot with 'browseVignettes(&quot;sjPlot&quot;)'.
+</code></pre>
+<pre><code class="language-r">library(sjlabelled)
 </code></pre>
 <pre><code>## 
 ## Attaching package: 'sjlabelled'
@@ -160,6 +164,18 @@ library(sjlabelled)
 </code></pre>
 <pre><code>## 
 ## Attaching package: 'sjmisc'
+</code></pre>
+<pre><code>## The following objects are masked from 'package:BBmisc':
+## 
+##     %nin%, seq_col, seq_row
+</code></pre>
+<pre><code>## The following object is masked from 'package:raster':
+## 
+##     trim
+</code></pre>
+<pre><code>## The following object is masked from 'package:terra':
+## 
+##     trim
 </code></pre>
 <pre><code>## The following object is masked from 'package:naniar':
 ## 
@@ -244,37 +260,37 @@ model_summary
 <tbody>
   <tr>
    <td style="text-align:left;"> Male </td>
-   <td style="text-align:center;"> 290.420 </td>
-   <td style="text-align:center;"> 290.420*** </td>
-   <td style="text-align:center;"> 336.274*** </td>
-   <td style="text-align:center;"> 441.885*** </td>
-   <td style="text-align:center;"> 10.947*** </td>
-   <td style="text-align:center;"> 10.952*** </td>
+   <td style="text-align:center;"> −1281.432*** </td>
+   <td style="text-align:center;"> −1281.432*** </td>
+   <td style="text-align:center;"> −1286.699*** </td>
+   <td style="text-align:center;"> −1365.098*** </td>
+   <td style="text-align:center;"> 4.250*** </td>
+   <td style="text-align:center;"> 4.260*** </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
-   <td style="text-align:center;"> (243.925) </td>
-   <td style="text-align:center;"> (63.452) </td>
-   <td style="text-align:center;"> (81.386) </td>
-   <td style="text-align:center;"> (106.195) </td>
-   <td style="text-align:center;"> (0.772) </td>
-   <td style="text-align:center;"> (0.774) </td>
+   <td style="text-align:center;"> (64.095) </td>
+   <td style="text-align:center;"> (101.518) </td>
+   <td style="text-align:center;"> (95.339) </td>
+   <td style="text-align:center;"> (107.041) </td>
+   <td style="text-align:center;"> (0.539) </td>
+   <td style="text-align:center;"> (0.539) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Year </td>
-   <td style="text-align:center;"> −0.079 </td>
-   <td style="text-align:center;"> −0.079*** </td>
-   <td style="text-align:center;"> −0.049* </td>
-   <td style="text-align:center;"> −0.029 </td>
+   <td style="text-align:center;"> −0.316*** </td>
+   <td style="text-align:center;"> −0.321*** </td>
+   <td style="text-align:center;"> −0.323*** </td>
+   <td style="text-align:center;"> −0.325*** </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
-   <td style="text-align:center;"> (0.086) </td>
-   <td style="text-align:center;"> (0.014) </td>
    <td style="text-align:center;"> (0.023) </td>
-   <td style="text-align:center;"> (0.026) </td>
+   <td style="text-align:center;"> (0.025) </td>
+   <td style="text-align:center;"> (0.024) </td>
+   <td style="text-align:center;"> (0.024) </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
   </tr>
@@ -284,7 +300,7 @@ model_summary
    <td style="text-align:center;">  </td>
    <td style="text-align:center;"> 0.000 </td>
    <td style="text-align:center;"> 0.000 </td>
-   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000+ </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -300,27 +316,27 @@ model_summary
    <td style="text-align:left;"> Years compulsory education </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> −0.058 </td>
-   <td style="text-align:center;"> −0.058 </td>
+   <td style="text-align:center;"> −0.207* </td>
+   <td style="text-align:center;"> −0.232* </td>
+   <td style="text-align:center;"> −0.044 </td>
    <td style="text-align:center;"> −0.046 </td>
-   <td style="text-align:center;"> −0.049 </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> (0.078) </td>
-   <td style="text-align:center;"> (0.082) </td>
-   <td style="text-align:center;"> (0.085) </td>
-   <td style="text-align:center;"> (0.085) </td>
+   <td style="text-align:center;"> (0.081) </td>
+   <td style="text-align:center;"> (0.093) </td>
+   <td style="text-align:center;"> (0.099) </td>
+   <td style="text-align:center;"> (0.100) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> GDP per capita </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.000 </td>
-   <td style="text-align:center;"> 0.000 </td>
-   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000+ </td>
+   <td style="text-align:center;"> 0.000+ </td>
+   <td style="text-align:center;"> 0.000+ </td>
    <td style="text-align:center;">  </td>
   </tr>
   <tr>
@@ -336,163 +352,163 @@ model_summary
    <td style="text-align:left;"> Youth unemployment </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> −0.274 </td>
-   <td style="text-align:center;"> −0.245 </td>
-   <td style="text-align:center;"> −0.240 </td>
-   <td style="text-align:center;"> −0.239 </td>
+   <td style="text-align:center;"> −0.260 </td>
+   <td style="text-align:center;"> −0.246 </td>
+   <td style="text-align:center;"> −0.297 </td>
+   <td style="text-align:center;"> −0.292 </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> (0.186) </td>
    <td style="text-align:center;"> (0.176) </td>
-   <td style="text-align:center;"> (0.176) </td>
-   <td style="text-align:center;"> (0.175) </td>
+   <td style="text-align:center;"> (0.169) </td>
+   <td style="text-align:center;"> (0.182) </td>
+   <td style="text-align:center;"> (0.181) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Total unemployment </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.756** </td>
-   <td style="text-align:center;"> 0.650* </td>
-   <td style="text-align:center;"> 0.640* </td>
-   <td style="text-align:center;"> 0.639* </td>
+   <td style="text-align:center;"> 0.514* </td>
+   <td style="text-align:center;"> 0.446+ </td>
+   <td style="text-align:center;"> 0.272 </td>
+   <td style="text-align:center;"> 0.274 </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> (0.285) </td>
-   <td style="text-align:center;"> (0.261) </td>
-   <td style="text-align:center;"> (0.260) </td>
-   <td style="text-align:center;"> (0.260) </td>
+   <td style="text-align:center;"> (0.259) </td>
+   <td style="text-align:center;"> (0.243) </td>
+   <td style="text-align:center;"> (0.255) </td>
+   <td style="text-align:center;"> (0.255) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Alcohol misuse </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.001 </td>
-   <td style="text-align:center;"> 0.001 </td>
-   <td style="text-align:center;"> 0.001 </td>
+   <td style="text-align:center;"> 0.001** </td>
+   <td style="text-align:center;"> 0.001* </td>
+   <td style="text-align:center;"> 0.001* </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> (0.001) </td>
-   <td style="text-align:center;"> (0.001) </td>
-   <td style="text-align:center;"> (0.001) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Drug misuse </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.012 </td>
-   <td style="text-align:center;"> 0.010 </td>
-   <td style="text-align:center;"> 0.010 </td>
+   <td style="text-align:center;"> 0.005 </td>
+   <td style="text-align:center;"> −0.010+ </td>
+   <td style="text-align:center;"> −0.010+ </td>
   </tr>
   <tr>
    <td style="text-align:left;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> (0.013) </td>
-   <td style="text-align:center;"> (0.013) </td>
-   <td style="text-align:center;"> (0.013) </td>
+   <td style="text-align:center;"> (0.006) </td>
+   <td style="text-align:center;"> (0.006) </td>
+   <td style="text-align:center;"> (0.006) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Self harm </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.204*** </td>
-   <td style="text-align:center;"> 0.205*** </td>
-   <td style="text-align:center;"> 0.205*** </td>
+   <td style="text-align:center;"> 0.040** </td>
+   <td style="text-align:center;"> 0.048** </td>
+   <td style="text-align:center;"> 0.048** </td>
   </tr>
   <tr>
    <td style="text-align:left;box-shadow: 0px 1px">  </td>
    <td style="text-align:center;box-shadow: 0px 1px">  </td>
    <td style="text-align:center;box-shadow: 0px 1px">  </td>
    <td style="text-align:center;box-shadow: 0px 1px">  </td>
-   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
-   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
-   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.012) </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.015) </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.015) </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Num.Obs. </td>
-   <td style="text-align:center;"> 3660 </td>
-   <td style="text-align:center;"> 3660 </td>
-   <td style="text-align:center;"> 3660 </td>
-   <td style="text-align:center;"> 3660 </td>
-   <td style="text-align:center;"> 3660 </td>
-   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 9044 </td>
+   <td style="text-align:center;"> 9044 </td>
+   <td style="text-align:center;"> 9044 </td>
+   <td style="text-align:center;"> 9044 </td>
+   <td style="text-align:center;"> 9044 </td>
+   <td style="text-align:center;"> 9044 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> R2 </td>
-   <td style="text-align:center;"> 0.209 </td>
-   <td style="text-align:center;"> 0.763 </td>
-   <td style="text-align:center;"> 0.771 </td>
-   <td style="text-align:center;"> 0.789 </td>
-   <td style="text-align:center;"> 0.789 </td>
-   <td style="text-align:center;"> 0.789 </td>
+   <td style="text-align:center;"> 0.088 </td>
+   <td style="text-align:center;"> 0.837 </td>
+   <td style="text-align:center;"> 0.839 </td>
+   <td style="text-align:center;"> 0.850 </td>
+   <td style="text-align:center;"> 0.810 </td>
+   <td style="text-align:center;"> 0.810 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> R2 Adj. </td>
-   <td style="text-align:center;"> 0.208 </td>
-   <td style="text-align:center;"> 0.751 </td>
-   <td style="text-align:center;"> 0.758 </td>
-   <td style="text-align:center;"> 0.778 </td>
-   <td style="text-align:center;"> 0.777 </td>
-   <td style="text-align:center;"> 0.777 </td>
+   <td style="text-align:center;"> 0.087 </td>
+   <td style="text-align:center;"> 0.833 </td>
+   <td style="text-align:center;"> 0.835 </td>
+   <td style="text-align:center;"> 0.846 </td>
+   <td style="text-align:center;"> 0.805 </td>
+   <td style="text-align:center;"> 0.805 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> R2 Within </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.469 </td>
-   <td style="text-align:center;"> 0.486 </td>
-   <td style="text-align:center;"> 0.527 </td>
-   <td style="text-align:center;"> 0.524 </td>
-   <td style="text-align:center;"> 0.524 </td>
+   <td style="text-align:center;"> 0.350 </td>
+   <td style="text-align:center;"> 0.359 </td>
+   <td style="text-align:center;"> 0.400 </td>
+   <td style="text-align:center;"> 0.241 </td>
+   <td style="text-align:center;"> 0.240 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> R2 Within Adj. </td>
    <td style="text-align:center;">  </td>
-   <td style="text-align:center;"> 0.469 </td>
-   <td style="text-align:center;"> 0.485 </td>
-   <td style="text-align:center;"> 0.525 </td>
-   <td style="text-align:center;"> 0.523 </td>
-   <td style="text-align:center;"> 0.523 </td>
+   <td style="text-align:center;"> 0.350 </td>
+   <td style="text-align:center;"> 0.358 </td>
+   <td style="text-align:center;"> 0.399 </td>
+   <td style="text-align:center;"> 0.240 </td>
+   <td style="text-align:center;"> 0.240 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> AIC </td>
-   <td style="text-align:center;"> 27609.5 </td>
-   <td style="text-align:center;"> 23554.6 </td>
-   <td style="text-align:center;"> 23446.8 </td>
-   <td style="text-align:center;"> 23148.2 </td>
-   <td style="text-align:center;"> 23172.1 </td>
-   <td style="text-align:center;"> 23168.9 </td>
+   <td style="text-align:center;"> 66546.8 </td>
+   <td style="text-align:center;"> 51389.7 </td>
+   <td style="text-align:center;"> 51272.6 </td>
+   <td style="text-align:center;"> 50683.6 </td>
+   <td style="text-align:center;"> 52818.7 </td>
+   <td style="text-align:center;"> 52821.8 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> BIC </td>
-   <td style="text-align:center;"> 27634.4 </td>
-   <td style="text-align:center;"> 24708.7 </td>
-   <td style="text-align:center;"> 24632.0 </td>
-   <td style="text-align:center;"> 24358.2 </td>
-   <td style="text-align:center;"> 24425.6 </td>
-   <td style="text-align:center;"> 24410.0 </td>
+   <td style="text-align:center;"> 66575.3 </td>
+   <td style="text-align:center;"> 52904.1 </td>
+   <td style="text-align:center;"> 52822.6 </td>
+   <td style="text-align:center;"> 52262.0 </td>
+   <td style="text-align:center;"> 54532.2 </td>
+   <td style="text-align:center;"> 54521.0 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> RMSE </td>
-   <td style="text-align:center;"> 10.50 </td>
-   <td style="text-align:center;"> 5.74 </td>
-   <td style="text-align:center;"> 5.65 </td>
-   <td style="text-align:center;"> 5.42 </td>
-   <td style="text-align:center;"> 5.43 </td>
-   <td style="text-align:center;"> 5.43 </td>
+   <td style="text-align:center;"> 9.58 </td>
+   <td style="text-align:center;"> 4.05 </td>
+   <td style="text-align:center;"> 4.02 </td>
+   <td style="text-align:center;"> 3.89 </td>
+   <td style="text-align:center;"> 4.37 </td>
+   <td style="text-align:center;"> 4.37 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> Std.Errors </td>
@@ -527,7 +543,7 @@ model_summary
 </table>
 <pre><code class="language-r">model_plot
 </code></pre>
-<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-4" /></p>
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-4" /></p>
 
 </div>
 

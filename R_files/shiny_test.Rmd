@@ -5,6 +5,8 @@ date: "2023-03-12"
 output: html_document
 runtime: shiny
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 
 # packages <- c("wbstats", "dplyr", "reshape", "tidyr", "countrycode", "tidyverse", "ggplot2", "expss", "writexl", "readxl", "imputeTS", "leaflet", )
 # 
@@ -30,68 +32,82 @@ library(kableExtra)
 library(leaflet)
 library(shiny)
 library(countrycode)
+library(readxl)
+library(ggplot2)
+library(rgdal)
+library(WDI)
+library(leaflet)
+library(terra)
+library(RColorBrewer)
+library(shiny)
+library(leaflet)
+library(raster)
+library(maps)
+library(plyr)
+library(rworldmap)
 
-# Define the UI
+```
+
+
+```{r prep, include = FALSE}
+
+
+
+
+```
+
+
+```{r shiny_app}
+
+
+# Define UI
 ui <- fluidPage(
-  titlePanel("Suicide Rates by Country"),
+  # Sidebar with inputs for year and sex
   sidebarLayout(
     sidebarPanel(
-      selectInput(inputId = "year",
-                  label = "Select a year:",
-                  choices = unique(suicide_final$year)),
-      selectInput(inputId = "sex",
-                  label = "Select a sex:",
-                  choices = c("Both", "Male", "Female"))
+      selectInput("year", label = "Year", choices = c(2020, 2021), selected = 2021),
+      selectInput("sex", label = "Sex", choices = c("Male", "Female"), selected = "Female")
     ),
+    
+    # Output with map
     mainPanel(
-      leafletOutput(outputId = "map", height = 600)
+      leafletOutput("map")
     )
   )
 )
 
-# Define the server
+# Define server
 server <- function(input, output) {
   
-  # Filter the data based on the inputs
+  # Load data
+  suicide_final_long <- read_excel("../data/suicide_final_long.xlsx", na = "")
+  
+  # Join data with map
+  df <- joinCountryData2Map(suicide_final_long, joinCode = "ISO3", nameJoinColumn = "iso3c", verbose = FALSE)
+  
+  # Filter data based on user input
   filtered_data <- reactive({
-    data <- subset(suicide_final, year == input$year)
-    if (input$sex != "Both") {
-      data <- subset(data, sex == input$sex)
-    }
-    data$iso3c <- countrycode(data$country, "country.name", "iso3c")
-    lat_long <- data.frame(country = unique(data$country),
-                           iso3c = unique(data$iso3c))
-    lat_long$lat <- countrycode(lat_long$iso3c, "iso3c", "latitude")
-    lat_long$long <- countrycode(lat_long$iso3c, "iso3c", "longitude")
-    data <- merge(data, lat_long, by = "country")
-    data
+    df[df$year == input$year & df$sex == input$sex & df$indicator == "sui"] 
   })
   
-  # Add the leaflet map
+  # Render map
   output$map <- renderLeaflet({
-    leaflet() %>%
-      addProviderTiles("CartoDB.Positron") %>%
-      setView(lat = 0, lng = 0, zoom = 2) %>%
-      addPolygons(data = filtered_data(),
-                  fillColor = ~colorQuantile("YlOrRd", sui)(sui),
-                  fillOpacity = 0.7,
-                  weight = 1,
-                  highlight = highlightOptions(
-                    weight = 3,
-                    color = "white",
-                    fillOpacity = 0.9,
-                    bringToFront = TRUE
-                  ),
-                  label = ~paste0(country, "<br> Suicides: ", sui)) %>%
-      addLegend("bottomright", 
-                title = "Suicide Rate", 
-                colors = colorQuantile("YlOrRd", sui)(seq(0, max(suicide_final$sui), length.out = 5)), 
-                labels = formatC(colorQuantile(sui, seq(0, max(suicide_final$sui), length.out = 5)), 
-                                 format = "e", 
-                                 digits = 1),
-                opacity = 0.7)
+    
+    # Create map
+    leaflet(filtered_data()) %>%
+      addTiles() %>%
+      addPolygons(data = filtered_data()$map,
+                  fillColor = ~colorNumeric(palette = "YlOrRd", domain = filtered_data()$indicator)(filtered_data()$indicator),
+                  fillOpacity = 0.8,
+                  color = "#BDBDC3",
+                  weight = 1)
   })
+  
 }
 
 # Run the app
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
+
+
+
+```

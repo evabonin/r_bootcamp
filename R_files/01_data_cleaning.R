@@ -34,6 +34,7 @@ library(zoo)
 
 
 
+
 # library(stringr)
 # library(imputeTS)
 # library(foreach)
@@ -343,6 +344,7 @@ tmp_subset30 <- tmp_na_count[tmp_na_count$count_na == 30, ]
 
 # print the values of count_na[1] in the subset
 print(tmp_subset30)
+print(filter(world_bank, country =="Afghanistan"))
 
 #' Countries that are missing 9 values (only have 9 lines because they only occur in the GDB dataset)
 
@@ -513,12 +515,17 @@ suicide_final <- suicide_final %>%
     TRUE ~ sui * pop_t/100000
   ))
 
+# Adding columns: longitude and latitude for mapping
+
+suicide_final$lat <- countrycode(suicide_final$iso3c, "iso3c", "latitude")
+suicide_final<- countrycode(suicide_finaliso3c, "iso3c", "longitude")
+
 
 
 #' Generating long dataset
 
 #+ long
-indicators <- c("gdp_pc", "edu", "sui_female", "sui_male", "sui", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
+indicators <- c("gdp_pc", "edu", "sui_female", "sui_male", "sui", "deaths", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
 
 suicide_final_long <- suicide_final %>%
   pivot_longer(cols = c(5:14),
@@ -547,6 +554,9 @@ suicide_final = apply_labels(suicide_final,
                              deaths = "Deaths by suicide",
                              year1 = "Year in date format")
 
+
+write_xlsx(suicide_final,"../data/suicide_final.xlsx")
+write_xlsx(suicide_final_long,"../data/suicide_final_long.xlsx")
 
 #' Removing temporary objects
 

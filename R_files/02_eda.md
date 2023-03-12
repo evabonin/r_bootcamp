@@ -1,13 +1,129 @@
+# Title
 
 
 ```r
 library(BBmisc)
+```
+
+```
+## 
+## Attaching package: 'BBmisc'
+```
+
+```
+## The following object is masked from 'package:terra':
+## 
+##     isFALSE
+```
+
+```
+## The following object is masked from 'package:maditr':
+## 
+##     coalesce
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     coalesce, collapse, symdiff
+```
+
+```
+## The following object is masked from 'package:base':
+## 
+##     isFALSE
+```
+
+```r
 library(tidyverse)
 library(table1)
+```
+
+```
+## 
+## Attaching package: 'table1'
+```
+
+```
+## The following objects are masked from 'package:terra':
+## 
+##     units, units<-
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     units, units<-
+```
+
+```r
 library(hrbrthemes) # theme ipsom
+```
+
+```
+## Registering Windows fonts with R
+```
+
+```
+## NOTE: Either Arial Narrow or Roboto Condensed fonts are required to use these themes.
+```
+
+```
+##       Please use hrbrthemes::import_roboto_condensed() to install Roboto Condensed and
+```
+
+```
+##       if Arial Narrow is not on your system, please see https://bit.ly/arialnarrow
+```
+
+```r
 library(ggplot2)
 library(dplyr)
 library(plotly)
+```
+
+```
+## 
+## Attaching package: 'plotly'
+```
+
+```
+## The following objects are masked from 'package:plyr':
+## 
+##     arrange, mutate, rename, summarise
+```
+
+```
+## The following object is masked from 'package:raster':
+## 
+##     select
+```
+
+```
+## The following object is masked from 'package:ggplot2':
+## 
+##     last_plot
+```
+
+```
+## The following object is masked from 'package:reshape':
+## 
+##     rename
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+```
+## The following object is masked from 'package:graphics':
+## 
+##     layout
+```
+
+```r
 library(webshot)
 
 
@@ -19,20 +135,20 @@ summary(suicide_final)
 ```
 
 ```
-##     iso3c             country               year          sex                gdp_pc            edu              sui             unem_y           unem_t           pop_t          
-##  Length:13566       Length:13566       Min.   :2000   Length:13566       Min.   :   261   Min.   : 0.000   Min.   :  0.00   Min.   : 0.194   Min.   : 0.050   Min.   :1.044e+04  
-##  Class1:labelled    Class1:labelled    1st Qu.:2005   Class1:labelled    1st Qu.:  2128   1st Qu.: 8.000   1st Qu.:  4.30   1st Qu.: 8.880   1st Qu.: 4.054   1st Qu.:1.436e+06  
-##  Class2:character   Class2:character   Median :2011   Class2:character   Median :  6019   Median :10.000   Median :  7.30   Median :14.293   Median : 6.061   Median :8.053e+06  
-##  Mode  :character   Mode  :character   Mean   :2011   Mode  :character   Mean   : 14128   Mean   : 9.704   Mean   : 10.15   Mean   :17.320   Mean   : 7.747   Mean   :3.794e+07  
-##                                        3rd Qu.:2016                      3rd Qu.: 15600   3rd Qu.:11.000   3rd Qu.: 13.25   3rd Qu.:23.000   3rd Qu.: 9.562   3rd Qu.:2.720e+07  
-##                                        Max.   :2021                      Max.   :204190   Max.   :17.000   Max.   :147.80   Max.   :80.762   Max.   :37.901   Max.   :1.412e+09  
-##       alc               drug             depr             sh           continent            region              year1                deaths         
-##  Min.   :  52.31   Min.   : 68.72   Min.   : 1034   Min.   :  6.791   Length:13566       Length:13566       Min.   :2000-01-01   Min.   :     0.00  
-##  1st Qu.: 287.63   1st Qu.:144.79   1st Qu.: 2711   1st Qu.: 23.832   Class1:labelled    Class1:labelled    1st Qu.:2005-01-01   1st Qu.:    63.64  
-##  Median : 576.05   Median :194.73   Median : 3642   Median : 39.908   Class2:character   Class2:character   Median :2011-01-01   Median :   354.89  
-##  Mean   : 744.55   Mean   :207.38   Mean   : 3869   Mean   : 60.656   Mode  :character   Mode  :character   Mean   :2010-07-10   Mean   :  2453.53  
-##  3rd Qu.:1087.74   3rd Qu.:248.73   3rd Qu.: 4747   3rd Qu.: 84.894                                         3rd Qu.:2016-01-01   3rd Qu.:  1163.88  
-##  Max.   :3678.89   Max.   :618.78   Max.   :11304   Max.   :883.830                                         Max.   :2021-01-01   Max.   :182251.67
+##     iso3c             country               year          sex                gdp_pc            edu              sui             unem_y           unem_t           pop_t                alc         
+##  Length:13566       Length:13566       Min.   :2000   Length:13566       Min.   :   261   Min.   : 0.000   Min.   :  0.00   Min.   : 0.194   Min.   : 0.050   Min.   :1.044e+04   Min.   :  52.31  
+##  Class1:labelled    Class1:labelled    1st Qu.:2005   Class1:labelled    1st Qu.:  2128   1st Qu.: 8.000   1st Qu.:  4.30   1st Qu.: 8.880   1st Qu.: 4.054   1st Qu.:1.436e+06   1st Qu.: 287.63  
+##  Class2:character   Class2:character   Median :2011   Class2:character   Median :  6019   Median :10.000   Median :  7.30   Median :14.293   Median : 6.061   Median :8.053e+06   Median : 576.05  
+##  Mode  :character   Mode  :character   Mean   :2011   Mode  :character   Mean   : 14128   Mean   : 9.704   Mean   : 10.15   Mean   :17.320   Mean   : 7.747   Mean   :3.794e+07   Mean   : 744.55  
+##                                        3rd Qu.:2016                      3rd Qu.: 15600   3rd Qu.:11.000   3rd Qu.: 13.25   3rd Qu.:23.000   3rd Qu.: 9.562   3rd Qu.:2.720e+07   3rd Qu.:1087.74  
+##                                        Max.   :2021                      Max.   :204190   Max.   :17.000   Max.   :147.80   Max.   :80.762   Max.   :37.901   Max.   :1.412e+09   Max.   :3678.89  
+##       drug             depr             sh           continent            region              year1                deaths         
+##  Min.   : 68.72   Min.   : 1034   Min.   :  6.791   Length:13566       Length:13566       Min.   :2000-01-01   Min.   :     0.00  
+##  1st Qu.:144.79   1st Qu.: 2711   1st Qu.: 23.832   Class1:labelled    Class1:labelled    1st Qu.:2005-01-01   1st Qu.:    63.64  
+##  Median :194.73   Median : 3642   Median : 39.908   Class2:character   Class2:character   Median :2011-01-01   Median :   354.89  
+##  Mean   :207.38   Mean   : 3869   Mean   : 60.656   Mode  :character   Mode  :character   Mean   :2010-07-10   Mean   :  2453.53  
+##  3rd Qu.:248.73   3rd Qu.: 4747   3rd Qu.: 84.894                                         3rd Qu.:2016-01-01   3rd Qu.:  1163.88  
+##  Max.   :618.78   Max.   :11304   Max.   :883.830                                         Max.   :2021-01-01   Max.   :182251.67
 ```
 
 ```r
@@ -52,76 +168,76 @@ table1
 ```
 
 ```
-##                                                                                                              Africa                   Americas                          Asia
-## 1                                                                                                          (N=1196)                    (N=870)                      (N=1090)
-## 2                                       Suicide mortality rate (per 100,000 population)                                                                                     
-## 3                                                                             Mean (SD)                 9.35 (11.0)                7.66 (7.25)                   7.36 (5.36)
-## 4                                                                     Median [Min, Max]           6.70 [1.50, 92.6]             5.90 [0, 40.3]             5.70 [1.50, 30.6]
-## 5                                                                     Deaths by suicide                                                                                     
-## 6                                                                             Mean (SD)                 1530 (2210)                2330 (7950)                  9230 (28600)
-## 7                                                                     Median [Min, Max]           901 [2.85, 14300]             292 [0, 53400]            796 [7.41, 182000]
-## 8                                                                      Total population                                                                                     
-## 9                                                                             Mean (SD)         22600000 (32900000)        25200000 (61000000)          96500000 (267000000)
-## 10                                                                    Median [Min, Max] 12100000 [88300, 213000000] 4960000 [56000, 332000000] 18400000 [388000, 1410000000]
-## 11                                               Compulsory education, duration (years)                                                                                     
-## 12                                                                            Mean (SD)                 8.35 (1.72)                11.5 (2.80)                   9.37 (1.88)
-## 13                                                                    Median [Min, Max]           8.00 [5.00, 12.0]          12.0 [6.00, 17.0]             9.00 [5.00, 15.0]
-## 14                                                   GDP per capita (constant 2015 US$)                                                                                     
-## 15                                                                            Mean (SD)                 2440 (2920)              14900 (19000)                 11500 (14600)
-## 16                                                                    Median [Min, Max]           1310 [261, 17000]        8300 [1280, 107000]             5180 [426, 72900]
-## 17 Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)                                                                                     
-## 18                                                                            Mean (SD)                 17.7 (15.4)                18.0 (8.32)                   14.4 (8.76)
-## 19                                                                    Median [Min, Max]          10.2 [0.670, 78.8]          18.2 [3.25, 48.6]            12.4 [0.380, 42.3]
-## 20                  Unemployment, total (% of total labor force) (modeled ILO estimate)                                                                                     
-## 21                                                                            Mean (SD)                 8.98 (6.98)                7.77 (3.54)                   5.88 (4.06)
-## 22                                                                    Median [Min, Max]          5.81 [0.520, 28.8]          7.51 [1.20, 22.2]            4.56 [0.100, 19.7]
-## 23                                                                        Alcohol abuse                                                                                     
-## 24                                                                            Mean (SD)                   437 (258)                  963 (295)                     612 (471)
-## 25                                                                    Median [Min, Max]             416 [159, 1190]            878 [431, 1740]               412 [167, 2270]
-## 26                                                                           Drug abuse                                                                                     
-## 27                                                                            Mean (SD)                  132 (46.4)                 236 (75.7)                    191 (48.5)
-## 28                                                                    Median [Min, Max]             115 [80.0, 334]             229 [129, 583]                184 [101, 352]
-## 29                                                                           Depression                                                                                     
-## 30                                                                            Mean (SD)                  3960 (989)                4030 (1110)                   3580 (1350)
-## 31                                                                    Median [Min, Max]           3720 [2180, 6620]          3740 [1980, 8320]             3330 [1200, 7340]
-## 32                                                                            Self harm                                                                                     
-## 33                                                                            Mean (SD)                 32.4 (17.1)                48.9 (91.2)                   56.4 (41.5)
-## 34                                                                    Median [Min, Max]           25.1 [11.5, 99.7]           21.0 [8.10, 666]              39.5 [17.9, 209]
-##                        Europe                  Oceania                     Overall
-## 1                     (N=932)                  (N=434)                    (N=4522)
-## 2                                                                                 
-## 3                 14.0 (5.86)              15.9 (9.80)                 10.1 (8.66)
-## 4          12.9 [0.600, 40.5]        12.6 [2.70, 30.5]              7.80 [0, 92.6]
-## 5                                                                                 
-## 6                 2810 (6750)                217 (666)                3680 (15200)
-## 7           803 [3.11, 49300]       25.8 [0.693, 3220]             600 [0, 182000]
-## 8                                                                                 
-## 9         17700000 (28500000)        2080000 (5590000)        37900000 (140000000)
-## 10 7040000 [33100, 144000000] 109000 [10400, 25700000] 8050000 [10400, 1410000000]
-## 11                                                                                
-## 12                10.4 (1.30)              9.16 (2.94)                 9.70 (2.36)
-## 13          10.0 [8.00, 13.0]           9.00 [0, 15.0]              10.0 [0, 17.0]
-## 14                                                                                
-## 15              32600 (32000)            11700 (14800)               14100 (21500)
-## 16       20200 [2120, 204000]       4280 [1350, 59300]          6020 [261, 204000]
-## 17                                                                                
-## 18                21.2 (11.9)              12.1 (4.36)                 17.1 (11.6)
-## 19          16.9 [5.62, 63.5]        12.9 [1.25, 27.8]          14.3 [0.380, 78.8]
-## 20                                                                                
-## 21                9.08 (5.48)              5.04 (1.98)                 7.64 (5.30)
-## 22          7.26 [2.01, 31.2]       4.95 [0.690, 12.2]          6.05 [0.100, 31.2]
-## 23                                                                                
-## 24                 1220 (256)                433 (216)                   742 (448)
-## 25           1220 [710, 2130]          363 [281, 1490]             655 [159, 2270]
-## 26                                                                                
-## 27                 281 (68.4)               238 (84.4)                  207 (82.6)
-## 28             285 [156, 435]           215 [172, 559]             196 [80.0, 583]
-## 29                                                                                
-## 30                4490 (1220)               2720 (896)                 3870 (1240)
-## 31          4440 [2050, 8860]        2470 [1860, 6320]           3700 [1200, 8860]
-## 32                                                                                
-## 33                99.3 (41.2)              88.5 (29.6)                 60.5 (56.1)
-## 34           92.5 [31.4, 252]         90.5 [20.1, 151]            39.5 [8.10, 666]
+##                                                                                                              Africa                   Americas                          Asia                     Europe
+## 1                                                                                                          (N=1196)                    (N=870)                      (N=1090)                    (N=932)
+## 2                                       Suicide mortality rate (per 100,000 population)                                                                                                                
+## 3                                                                             Mean (SD)                 9.35 (11.0)                7.66 (7.25)                   7.36 (5.36)                14.0 (5.86)
+## 4                                                                     Median [Min, Max]           6.70 [1.50, 92.6]             5.90 [0, 40.3]             5.70 [1.50, 30.6]         12.9 [0.600, 40.5]
+## 5                                                                     Deaths by suicide                                                                                                                
+## 6                                                                             Mean (SD)                 1530 (2210)                2330 (7950)                  9230 (28600)                2810 (6750)
+## 7                                                                     Median [Min, Max]           901 [2.85, 14300]             292 [0, 53400]            796 [7.41, 182000]          803 [3.11, 49300]
+## 8                                                                      Total population                                                                                                                
+## 9                                                                             Mean (SD)         22600000 (32900000)        25200000 (61000000)          96500000 (267000000)        17700000 (28500000)
+## 10                                                                    Median [Min, Max] 12100000 [88300, 213000000] 4960000 [56000, 332000000] 18400000 [388000, 1410000000] 7040000 [33100, 144000000]
+## 11                                               Compulsory education, duration (years)                                                                                                                
+## 12                                                                            Mean (SD)                 8.35 (1.72)                11.5 (2.80)                   9.37 (1.88)                10.4 (1.30)
+## 13                                                                    Median [Min, Max]           8.00 [5.00, 12.0]          12.0 [6.00, 17.0]             9.00 [5.00, 15.0]          10.0 [8.00, 13.0]
+## 14                                                   GDP per capita (constant 2015 US$)                                                                                                                
+## 15                                                                            Mean (SD)                 2440 (2920)              14900 (19000)                 11500 (14600)              32600 (32000)
+## 16                                                                    Median [Min, Max]           1310 [261, 17000]        8300 [1280, 107000]             5180 [426, 72900]       20200 [2120, 204000]
+## 17 Unemployment, youth total (% of total labor force ages 15-24) (modeled ILO estimate)                                                                                                                
+## 18                                                                            Mean (SD)                 17.7 (15.4)                18.0 (8.32)                   14.4 (8.76)                21.2 (11.9)
+## 19                                                                    Median [Min, Max]          10.2 [0.670, 78.8]          18.2 [3.25, 48.6]            12.4 [0.380, 42.3]          16.9 [5.62, 63.5]
+## 20                  Unemployment, total (% of total labor force) (modeled ILO estimate)                                                                                                                
+## 21                                                                            Mean (SD)                 8.98 (6.98)                7.77 (3.54)                   5.88 (4.06)                9.08 (5.48)
+## 22                                                                    Median [Min, Max]          5.81 [0.520, 28.8]          7.51 [1.20, 22.2]            4.56 [0.100, 19.7]          7.26 [2.01, 31.2]
+## 23                                                                        Alcohol abuse                                                                                                                
+## 24                                                                            Mean (SD)                   437 (258)                  963 (295)                     612 (471)                 1220 (256)
+## 25                                                                    Median [Min, Max]             416 [159, 1190]            878 [431, 1740]               412 [167, 2270]           1220 [710, 2130]
+## 26                                                                           Drug abuse                                                                                                                
+## 27                                                                            Mean (SD)                  132 (46.4)                 236 (75.7)                    191 (48.5)                 281 (68.4)
+## 28                                                                    Median [Min, Max]             115 [80.0, 334]             229 [129, 583]                184 [101, 352]             285 [156, 435]
+## 29                                                                           Depression                                                                                                                
+## 30                                                                            Mean (SD)                  3960 (989)                4030 (1110)                   3580 (1350)                4490 (1220)
+## 31                                                                    Median [Min, Max]           3720 [2180, 6620]          3740 [1980, 8320]             3330 [1200, 7340]          4440 [2050, 8860]
+## 32                                                                            Self harm                                                                                                                
+## 33                                                                            Mean (SD)                 32.4 (17.1)                48.9 (91.2)                   56.4 (41.5)                99.3 (41.2)
+## 34                                                                    Median [Min, Max]           25.1 [11.5, 99.7]           21.0 [8.10, 666]              39.5 [17.9, 209]           92.5 [31.4, 252]
+##                     Oceania                     Overall
+## 1                   (N=434)                    (N=4522)
+## 2                                                      
+## 3               15.9 (9.80)                 10.1 (8.66)
+## 4         12.6 [2.70, 30.5]              7.80 [0, 92.6]
+## 5                                                      
+## 6                 217 (666)                3680 (15200)
+## 7        25.8 [0.693, 3220]             600 [0, 182000]
+## 8                                                      
+## 9         2080000 (5590000)        37900000 (140000000)
+## 10 109000 [10400, 25700000] 8050000 [10400, 1410000000]
+## 11                                                     
+## 12              9.16 (2.94)                 9.70 (2.36)
+## 13           9.00 [0, 15.0]              10.0 [0, 17.0]
+## 14                                                     
+## 15            11700 (14800)               14100 (21500)
+## 16       4280 [1350, 59300]          6020 [261, 204000]
+## 17                                                     
+## 18              12.1 (4.36)                 17.1 (11.6)
+## 19        12.9 [1.25, 27.8]          14.3 [0.380, 78.8]
+## 20                                                     
+## 21              5.04 (1.98)                 7.64 (5.30)
+## 22       4.95 [0.690, 12.2]          6.05 [0.100, 31.2]
+## 23                                                     
+## 24                433 (216)                   742 (448)
+## 25          363 [281, 1490]             655 [159, 2270]
+## 26                                                     
+## 27               238 (84.4)                  207 (82.6)
+## 28           215 [172, 559]             196 [80.0, 583]
+## 29                                                     
+## 30               2720 (896)                 3870 (1240)
+## 31        2470 [1860, 6320]           3700 [1200, 8860]
+## 32                                                     
+## 33              88.5 (29.6)                 60.5 (56.1)
+## 34         90.5 [20.1, 151]            39.5 [8.10, 666]
 ```
 
 # Creating some data frames for plotting
@@ -316,7 +432,7 @@ p1 <- ggplotly(p1)
 p1
 ```
 
-![plot of chunk box_cont](figure/box_cont-1.png)![plot of chunk box_cont](figure/box_cont-2.png)
+![plot of chunk box_cont](figure/box_cont-1.png)
 
 ```r
 # from: https://r-graph-gallery.com/163-interactive-area-chart-plotly.html
@@ -333,7 +449,7 @@ m_c <- ggplotly(m_c)
 m_c
 ```
 
-![plot of chunk line_cont](figure/line_cont-1.png)![plot of chunk line_cont](figure/line_cont-2.png)
+![plot of chunk line_cont](figure/line_cont-1.png)
 
 ```r
 # save the widget
@@ -357,7 +473,7 @@ q <- ggplotly(q)
 q
 ```
 
-![plot of chunk deaths_cont](figure/deaths_cont-1.png)![plot of chunk deaths_cont](figure/deaths_cont-2.png)
+![plot of chunk deaths_cont](figure/deaths_cont-1.png)
 
 #' Covariation
 # Categorical and continuous var
@@ -386,7 +502,7 @@ p <- ggplotly(p)
 p
 ```
 
-![plot of chunk case1](figure/case1-1.png)![plot of chunk case1](figure/case1-2.png)
+![plot of chunk case1](figure/case1-1.png)
 
 suicide rate over time plus cumulative deaths
 

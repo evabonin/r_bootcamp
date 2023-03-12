@@ -62,7 +62,7 @@ library(zoo)
 #                       mrv = 10,
 #                       gapfill = TRUE) # this automatically does interpolation!
 #%>% 
- # filter(date >= 2017)
+# filter(date >= 2017)
 
 # Saving to Excel because I've had issues accessing the World Bank server
 # write_xlsx(world_bank,"../data/world_bank.xlsx")
@@ -86,7 +86,7 @@ tmp_wb_long <- world_bank %>%
   pivot_longer(cols = !c(country, iso3c, iso2c, year),
                names_to = "indicator",
                values_to = "value"
-               )
+  )
 
 tmp_wb_long[tmp_wb_long == 'NULL'] <- NA
 
@@ -138,10 +138,7 @@ gbd <- gbd %>%
 ```
 
 ```
-## Warning: There was 1 warning in `mutate()`.
-## ℹ In argument: `iso3c = countrycode(location_name, "country.name", "wb")`.
-## Caused by warning in `countrycode_convert()`:
-## ! Some values were not matched unambiguously: Cook Islands, Niue, Tokelau, Turkiye
+## Warning in countrycode_convert(sourcevar = sourcevar, origin = origin, destination = dest, : Some values were not matched unambiguously: Cook Islands, Niue, Tokelau, Turkiye
 ```
 
 ```r
@@ -206,7 +203,7 @@ tmp_wb_gbd_long[tmp_wb_gbd_long == 'NULL'] <- NA
 
 tmp_wb_gbd_wide <- tmp_wb_gbd_long %>%
   pivot_wider(names_from = "indicator",
-               values_from = "value"
+              values_from = "value"
   )
 
 continent <- read.csv("../data/continents.csv") 
@@ -292,30 +289,22 @@ summary(tmp_wb_gbd_wide)
 ```
 
 ```
-##     iso3c             country               year          sex                gdp_pc            edu              sui         
-##  Length:14166       Length:14166       Min.   :2000   Length:14166       Min.   :   261   Min.   : 0.000   Min.   :  0.000  
-##  Class :character   Class :character   1st Qu.:2005   Class :character   1st Qu.:  2201   1st Qu.: 9.000   1st Qu.:  3.700  
-##  Mode  :character   Mode  :character   Median :2011   Mode  :character   Median :  6195   Median :10.000   Median :  6.900  
-##                                        Mean   :2011                      Mean   : 16575   Mean   : 9.895   Mean   :  9.942  
-##                                        3rd Qu.:2016                      3rd Qu.: 19843   3rd Qu.:12.000   3rd Qu.: 12.200  
-##                                        Max.   :2021                      Max.   :204190   Max.   :17.000   Max.   :147.800  
-##                                                                          NA's   :12067    NA's   :12210    NA's   :8676     
-##      unem_y           unem_t           pop_t           Alcohol use disorders Drug use disorders Depressive disorders
-##  Min.   : 0.194   Min.   : 0.050   Min.   :1.044e+04   Min.   :  52.31       Min.   : 68.72     Min.   : 1034       
-##  1st Qu.: 8.062   1st Qu.: 3.740   1st Qu.:7.521e+05   1st Qu.: 281.57       1st Qu.:144.63     1st Qu.: 2663       
-##  Median :14.712   Median : 6.110   Median :6.220e+06   Median : 563.85       Median :194.31     Median : 3635       
-##  Mean   :18.092   Mean   : 8.189   Mean   :3.458e+07   Mean   : 743.78       Mean   :207.34     Mean   : 3874       
-##  3rd Qu.:24.653   3rd Qu.:11.051   3rd Qu.:2.336e+07   3rd Qu.:1089.44       3rd Qu.:249.96     3rd Qu.: 4770       
-##  Max.   :80.762   Max.   :42.551   Max.   :1.412e+09   Max.   :3678.89       Max.   :618.78     Max.   :11304       
-##  NA's   :8556     NA's   :8556     NA's   :11996       NA's   :1926          NA's   :1926       NA's   :1926        
-##    Self-harm        continent          sub_region       
-##  Min.   :  6.791   Length:14166       Length:14166      
-##  1st Qu.: 23.819   Class :character   Class :character  
-##  Median : 40.020   Mode  :character   Mode  :character  
-##  Mean   : 60.645                                        
-##  3rd Qu.: 84.176                                        
-##  Max.   :883.830                                        
-##  NA's   :1926
+##     iso3c             country               year          sex                gdp_pc            edu              sui              unem_y           unem_t           pop_t           Alcohol use disorders
+##  Length:15694       Length:15694       Min.   :2000   Length:15694       Min.   :   261   Min.   : 0.000   Min.   :  0.000   Min.   : 0.194   Min.   : 0.050   Min.   :1.044e+04   Min.   :  52.31      
+##  Class :character   Class :character   1st Qu.:2006   Class :character   1st Qu.:  2201   1st Qu.: 9.000   1st Qu.:  3.700   1st Qu.: 8.062   1st Qu.: 3.740   1st Qu.:7.521e+05   1st Qu.: 281.57      
+##  Mode  :character   Mode  :character   Median :2012   Mode  :character   Median :  6195   Median :10.000   Median :  6.900   Median :14.712   Median : 6.110   Median :6.220e+06   Median : 563.85      
+##                                        Mean   :2011                      Mean   : 16575   Mean   : 9.895   Mean   :  9.942   Mean   :18.092   Mean   : 8.189   Mean   :3.458e+07   Mean   : 743.78      
+##                                        3rd Qu.:2017                      3rd Qu.: 19843   3rd Qu.:12.000   3rd Qu.: 12.200   3rd Qu.:24.653   3rd Qu.:11.051   3rd Qu.:2.336e+07   3rd Qu.:1089.44      
+##                                        Max.   :2021                      Max.   :204190   Max.   :17.000   Max.   :147.800   Max.   :80.762   Max.   :42.551   Max.   :1.412e+09   Max.   :3678.89      
+##                                                                          NA's   :13595    NA's   :13738    NA's   :10204     NA's   :10084    NA's   :10084    NA's   :13524       NA's   :3454         
+##  Drug use disorders Depressive disorders   Self-harm        continent          sub_region       
+##  Min.   : 68.72     Min.   : 1034        Min.   :  6.791   Length:15694       Length:15694      
+##  1st Qu.:144.63     1st Qu.: 2663        1st Qu.: 23.819   Class :character   Class :character  
+##  Median :194.31     Median : 3635        Median : 40.020   Mode  :character   Mode  :character  
+##  Mean   :207.34     Mean   : 3874        Mean   : 60.645                                        
+##  3rd Qu.:249.96     3rd Qu.: 4770        3rd Qu.: 84.176                                        
+##  Max.   :618.78     Max.   :11304        Max.   :883.830                                        
+##  NA's   :3454       NA's   :3454         NA's   :3454
 ```
 
 ```r
@@ -326,10 +315,8 @@ varnames_old
 ```
 
 ```
-##  [1] "iso3c"                 "country"               "year"                  "sex"                   "gdp_pc"               
-##  [6] "edu"                   "sui"                   "unem_y"                "unem_t"                "pop_t"                
-## [11] "Alcohol use disorders" "Drug use disorders"    "Depressive disorders"  "Self-harm"             "continent"            
-## [16] "sub_region"
+##  [1] "iso3c"                 "country"               "year"                  "sex"                   "gdp_pc"                "edu"                   "sui"                   "unem_y"               
+##  [9] "unem_t"                "pop_t"                 "Alcohol use disorders" "Drug use disorders"    "Depressive disorders"  "Self-harm"             "continent"             "sub_region"
 ```
 
 ```r
@@ -352,24 +339,40 @@ colnames(tmp_wb_gbd_wide) <- varnames_new
 tmp_wb_gbd_wide.both <- tmp_wb_gbd_wide %>% 
   filter(sex == "Both") %>% 
   select(!sex)
+```
 
+```
+## Error in (function (classes, fdef, mtable) : unable to find an inherited method for function 'select' for signature '"tbl_df"'
+```
+
+```r
 ## Join the two data sets because you have to make sure that contry and year
 ## are correctly merged. 
 tmp_wb_gbd_wide.tmp2 <- 
   left_join(x = tmp_wb_gbd_wide, y = tmp_wb_gbd_wide.both, 
             by = c("country", "year"),
             suffix = c("", ".y"))
+```
 
+```
+## Error in is.data.frame(y): object 'tmp_wb_gbd_wide.both' not found
+```
 
+```r
 ### finally got this working, I'm sure there is a more elegant way of doing this.
 # NEed to explicitly include plyr here, otherwise get an error.
 tmp_wb_gbd_wide <- tmp_wb_gbd_wide.tmp2 %>% 
   plyr::mutate(sui = coalesce(sui, sui.y),
-         gdp_pc = coalesce(gdp_pc, gdp_pc.y), 
-         edu = coalesce(edu, edu.y), 
-         pop_t = coalesce(pop_t, pop_t.y))
-         
-         
+               gdp_pc = coalesce(gdp_pc, gdp_pc.y), 
+               edu = coalesce(edu, edu.y), 
+               pop_t = coalesce(pop_t, pop_t.y))
+```
+
+```
+## Error in is.data.frame(.data): object 'tmp_wb_gbd_wide.tmp2' not found
+```
+
+```r
 # remove columns with .y suffix
 
 columns_to_remove <- grep("\\.y", names(tmp_wb_gbd_wide))
@@ -378,7 +381,14 @@ tmp_wb_gbd_wide <- tmp_wb_gbd_wide[,-columns_to_remove]
 
 # list of countries
 tmp_countries_wb_gbd <- as.list(unique(tmp_wb_gbd_wide[c("country")]))
+```
 
+```
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'as.list': error in evaluating the argument 'x' in selecting a method for function 'unique': Can't subset columns that don't exist.
+## x Column `country` doesn't exist.
+```
+
+```r
 length(tmp_countries_wb_gbd[[1]])
 ```
 
@@ -399,16 +409,33 @@ Exploring missing values
 tmp_na_count <- tmp_wb_gbd_wide %>%
   group_by(country) %>%
   dplyr::summarize(count_na = sum(is.na(sui)))
+```
 
+```
+## Error in `group_by()`:
+## ! Must group by variables found in `.data`.
+## x Column `country` is not found.
+```
+
+```r
 # count the occurrences of each value in count_na[2]
 tmp_counts <- table(tmp_na_count$count_na)
+```
+
+```
+## Error in table(tmp_na_count$count_na): object 'tmp_na_count' not found
+```
+
+```r
 # print(tmp_counts)
 
 # create a bar plot of the counts
 barplot(tmp_counts, xlab = "Number of NA Values", ylab = "Count", main = "Counts of NA Values")
 ```
 
-![plot of chunk Missings](figure/Missings-1.png)
+```
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'height' in selecting a method for function 'barplot': object 'tmp_counts' not found
+```
 
 Countries that are missing 30 all instances
 
@@ -417,35 +444,19 @@ Countries that are missing 30 all instances
 # Which countries are missing missing?
 # subset na_count to include only rows where count_na[2] is 15
 tmp_subset30 <- tmp_na_count[tmp_na_count$count_na == 30, ]
+```
 
+```
+## Error in eval(expr, envir, enclos): object 'tmp_na_count' not found
+```
+
+```r
 # print the values of count_na[1] in the subset
 print(tmp_subset30)
 ```
 
 ```
-## # A tibble: 20 × 2
-##    country                   count_na
-##    <chr>                        <int>
-##  1 Aruba                           30
-##  2 British Virgin Islands          30
-##  3 Cayman Islands                  30
-##  4 Channel Islands                 30
-##  5 Curacao                         30
-##  6 Faroe Islands                   30
-##  7 French Polynesia                30
-##  8 Gibraltar                       30
-##  9 Hong Kong SAR, China            30
-## 10 Isle of Man                     30
-## 11 Kosovo                          30
-## 12 Liechtenstein                   30
-## 13 Macao SAR, China                30
-## 14 New Caledonia                   30
-## 15 Sint Maarten (Dutch part)       30
-## 16 St. Kitts and Nevis             30
-## 17 St. Martin (French part)        30
-## 18 Turks and Caicos Islands        30
-## 19 Virgin Islands (U.S.)           30
-## 20 West Bank and Gaza              30
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'print': object 'tmp_subset30' not found
 ```
 
 Countries that are missing 9 values (only have 9 lines because they only occur in the GDB dataset)
@@ -455,14 +466,19 @@ Countries that are missing 9 values (only have 9 lines because they only occur i
 # Which countries are missing 9 values?
 # subset na_count to include only rows where count_na[2] is 15
 tmp_subset9 <- tmp_na_count[tmp_na_count$count_na == 9, ]
+```
 
+```
+## Error in eval(expr, envir, enclos): object 'tmp_na_count' not found
+```
+
+```r
 # print the values of count_na[1] in the subset
 print(tmp_subset9, n=50)
 ```
 
 ```
-## # A tibble: 0 × 2
-## # … with 2 variables: country <chr>, count_na <int>
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'print': object 'tmp_subset9' not found
 ```
 
 remove countries with no data on suicide rates
@@ -471,27 +487,44 @@ remove countries with no data on suicide rates
 ```r
 # create a vector of values to exclude
 tmp_exclude_vec <- as.character(c(tmp_subset30[[1]], tmp_subset9[[1]]))
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'tmp_subset30' not found
+```
+
+```r
 tmp_exclude_vec
 ```
 
 ```
-##  [1] "Aruba"                     "British Virgin Islands"    "Cayman Islands"            "Channel Islands"          
-##  [5] "Curacao"                   "Faroe Islands"             "French Polynesia"          "Gibraltar"                
-##  [9] "Hong Kong SAR, China"      "Isle of Man"               "Kosovo"                    "Liechtenstein"            
-## [13] "Macao SAR, China"          "New Caledonia"             "Sint Maarten (Dutch part)" "St. Kitts and Nevis"      
-## [17] "St. Martin (French part)"  "Turks and Caicos Islands"  "Virgin Islands (U.S.)"     "West Bank and Gaza"
+## Error in eval(expr, envir, enclos): object 'tmp_exclude_vec' not found
 ```
 
 ```r
 # subset the data frame to exclude rows where the value in the column is in the exclude_vec
 tmp_wb_gbd_wide <- subset(tmp_wb_gbd_wide, !country %in% tmp_exclude_vec)
+```
 
+```
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function '%in%': object 'country' not found
+```
+
+```r
 tmp_test_countries <- as.list(unique(tmp_wb_gbd_wide[c("country")]))
+```
+
+```
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'as.list': error in evaluating the argument 'x' in selecting a method for function 'unique': Can't subset columns that don't exist.
+## x Column `country` doesn't exist.
+```
+
+```r
 length(tmp_test_countries[[1]])
 ```
 
 ```
-## [1] 210
+## Error in eval(expr, envir, enclos): object 'tmp_test_countries' not found
 ```
 
 ```r
@@ -511,17 +544,23 @@ length(tmp_test_countries[[1]])
 tmp_df_by_country <- tmp_wb_gbd_wide %>%
   group_by(country, sex) %>%
   arrange(year)
+```
 
+```
+## Error in `group_by()`:
+## ! Must group by variables found in `.data`.
+## Column `country` is not found.
+## Column `sex` is not found.
+```
+
+```r
 # Create a heatmap of missing data using vis_miss()
 vis_miss(tmp_df_by_country)
 ```
 
 ```
-## Warning: Raster pixels are placed at uneven horizontal intervals and will be shifted
-## ℹ Consider using `geom_tile()` instead.
+## Error in test_if_dataframe(x): object 'tmp_df_by_country' not found
 ```
-
-![plot of chunk vis_miss](figure/vis_miss-1.png)
 
 ```r
 ###############################################################################
@@ -590,10 +629,7 @@ tmp_wb_gbd_wide %>% is.na() %>% colSums()
 ```
 
 ```
-##     iso3c   country      year       sex    gdp_pc       edu       sui    unem_y    unem_t     pop_t       alc      drug      depr 
-##         0         0         0         0      7722      8100      8076      8166      8166      7656      1326      1326      1326 
-##        sh continent    region 
-##      1326         0         0
+## numeric(0)
 ```
 
 ```r
@@ -604,8 +640,10 @@ tmp_df_imputed <- tmp_wb_gbd_wide %>%
 ```
 
 ```
-## `mutate_if()` ignored the following grouping variables:
-## • Columns `country`, `year`
+## Error in `group_by()`:
+## ! Must group by variables found in `.data`.
+## Column `country` is not found.
+## Column `year` is not found.
 ```
 
 ```r
@@ -613,10 +651,7 @@ tmp_df_imputed %>% is.na() %>% colSums()
 ```
 
 ```
-##     iso3c   country      year       sex    gdp_pc       edu       sui    unem_y    unem_t     pop_t       alc      drug      depr 
-##         0         0         0         0      7722      8100      8076      8166      8166      7656      1326      1326      1326 
-##        sh continent    region 
-##      1326         0         0
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'colSums': object 'tmp_df_imputed' not found
 ```
 
 ```r
@@ -629,8 +664,7 @@ tmp_df_imputed2 <- tmp_df_imputed %>%
 ```
 
 ```
-## `mutate_if()` ignored the following grouping variables:
-## • Column `country`
+## Error in group_by(., country): object 'tmp_df_imputed' not found
 ```
 
 ```r
@@ -638,10 +672,7 @@ tmp_df_imputed2 %>% is.na() %>% colSums()
 ```
 
 ```
-##     iso3c   country      year       sex    gdp_pc       edu       sui    unem_y    unem_t     pop_t       alc      drug      depr 
-##         0         0         0         0       876      1638      1704      1902      1902       780       180       180       180 
-##        sh continent    region 
-##       180         0         0
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'colSums': object 'tmp_df_imputed2' not found
 ```
 
 ```r
@@ -655,8 +686,7 @@ tmp_df_imputed3 <- tmp_df_imputed2 %>%
 ```
 
 ```
-## `mutate_if()` ignored the following grouping variables:
-## • Column `region`
+## Error in group_by(., region): object 'tmp_df_imputed2' not found
 ```
 
 ```r
@@ -664,10 +694,7 @@ tmp_df_imputed3 %>% is.na() %>% colSums()
 ```
 
 ```
-##     iso3c   country      year       sex    gdp_pc       edu       sui    unem_y    unem_t     pop_t       alc      drug      depr 
-##         0         0         0         0         0       264         0         0         0         0         0         0         0 
-##        sh continent    region 
-##         0         0         0
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'colSums': object 'tmp_df_imputed3' not found
 ```
 
 ```r
@@ -680,8 +707,7 @@ tmp_df_imputed4 <- tmp_df_imputed3 %>%
 ```
 
 ```
-## `mutate_if()` ignored the following grouping variables:
-## • Column `continent`
+## Error in group_by(., continent): object 'tmp_df_imputed3' not found
 ```
 
 ```r
@@ -689,10 +715,7 @@ tmp_df_imputed4 %>% is.na() %>% colSums()
 ```
 
 ```
-##     iso3c   country      year       sex    gdp_pc       edu       sui    unem_y    unem_t     pop_t       alc      drug      depr 
-##         0         0         0         0         0         0         0         0         0         0         0         0         0 
-##        sh continent    region 
-##         0         0         0
+## Error in h(simpleError(msg, call)): error in evaluating the argument 'x' in selecting a method for function 'colSums': object 'tmp_df_imputed4' not found
 ```
 
 Saving final dataset in wide format
@@ -700,8 +723,13 @@ Saving final dataset in wide format
 
 ```r
 suicide_final <- tmp_df_imputed4
+```
 
+```
+## Error in eval(expr, envir, enclos): object 'tmp_df_imputed4' not found
+```
 
+```r
 #write_xlsx(df_imputed3,"../data/suicide_final.xlsx")
 ```
 
@@ -716,7 +744,7 @@ str(suicide_final$year1)
 ```
 
 ```
-##  Date[1:13566], format: "2012-01-01" "2012-01-01" "2012-01-01" "2013-01-01" "2013-01-01" "2013-01-01" "2014-01-01" "2014-01-01" "2014-01-01" ...
+##  Date[1:13566], format: "2012-01-01" "2012-01-01" "2012-01-01" "2013-01-01" "2013-01-01" "2013-01-01" "2014-01-01" "2014-01-01" "2014-01-01" "2015-01-01" "2015-01-01" "2015-01-01" "2016-01-01" "2016-01-01" "2016-01-01" ...
 ```
 
 ```r
@@ -724,16 +752,32 @@ str(suicide_final$year1)
 # Assuming population is 50/50 male / female, which is not true!
 suicide_final <- suicide_final %>%
   mutate(deaths = case_when(
-    sex %in% c("Male", "Female") ~ sui * pop_t * 0.5,
-    TRUE ~ sui * pop_t
+    sex %in% c("Male", "Female") ~ sui * pop_t/100000 * 0.5,
+    TRUE ~ sui * pop_t/100000
   ))
+
+# Adding columns: longitude and latitude for mapping
+
+suicide_final$lat <- countrycode(suicide_final$iso3c, "iso3c", "latitude")
+```
+
+```
+## Error in countrycode(suicide_final$iso3c, "iso3c", "latitude"): The `destination` argument must be a string or a vector of strings where each element is equal to one of the column names in the conversion directory (by default: `codelist`).
+```
+
+```r
+suicide_final<- countrycode(suicide_finaliso3c, "iso3c", "longitude")
+```
+
+```
+## Error in mode(sourcevar): object 'suicide_finaliso3c' not found
 ```
 
 Generating long dataset
 
 
 ```r
-indicators <- c("gdp_pc", "edu", "sui_female", "sui_male", "sui", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
+indicators <- c("gdp_pc", "edu", "sui_female", "sui_male", "sui", "deaths", "unem_y_female", "unem_y_male", "unem_y", "unem_t_female", "unem_t_male", "unem_t", "pop_t")
 
 suicide_final_long <- suicide_final %>%
   pivot_longer(cols = c(5:14),
@@ -766,6 +810,10 @@ suicide_final = apply_labels(suicide_final,
                              region = "Sub-region",
                              deaths = "Deaths by suicide",
                              year1 = "Year in date format")
+
+
+write_xlsx(suicide_final,"../data/suicide_final.xlsx")
+write_xlsx(suicide_final_long,"../data/suicide_final_long.xlsx")
 ```
 
 Removing temporary objects

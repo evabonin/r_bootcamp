@@ -118,7 +118,7 @@ colnames(gbd) <- gbd_newnames
 library(rworldmap)
 
 # Joining the data to a country map on Country.Code variable
-sPDF <- joinCountryData2Map(world_bank_long, joinCode = "ISO3", nameJoinColumn = "Country.Code", verbose = TRUE)
+sPDF <- joinCountryData2Map(suicide_final_long, joinCode = "ISO3", nameJoinColumn = "country", verbose = TRUE)
 # This doesn't map regions (only countries), which makes sense
 
 par(mai=c(0,0,0.2,0),xaxs="i",yaxs="i")
@@ -138,13 +138,13 @@ library(dplyr)
 library(ggplot2)
 
 for (i in 2000:2019) { 
-  map <- paste0("graphs/suicide_rates_map",i, ".png")
+  map <- paste0("../graphs/suicide_rates_map",i, ".png")
   #print(map)
   png(map,width=800,height=800,units="px")
   df <- world_bank_long %>% 
     filter(Year == i) %>% 
-    filter(Series.Code == "SH.STA.SUIC.P5")
-  sPDF <- joinCountryData2Map(df, joinCode = "ISO3", nameJoinColumn = "Country.Code", verbose = FALSE)
+    filter(indicator == "sui")
+  sPDF <- joinCountryData2Map(suicide_final_long, joinCode = "ISO3", nameJoinColumn = "country", verbose = TRUE)
   par(mai=c(0,0,0.2,0),xaxs="i",yaxs="i")
   mapCountryData(sPDF, nameColumnToPlot="value")
   dev.off()

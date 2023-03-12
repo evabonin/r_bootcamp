@@ -3,11 +3,71 @@ title: "Suicide and economic and social conditions"
 author: "Eva-Maria Bonin"
 date: "`r Sys.Date()`"
 output: html_document
-#runtime: shiny
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+
+library(shiny)
+library(leaflet)
+library(rgdal)
+library(dplyr)
+
+# Tutorial: https://r-graph-gallery.com/183-choropleth-map-with-leaflet.html
+
+```
+
+```{r prep}
+
+# Download the shapefile. (note that I store it in a folder called DATA. You have to change that if needed.)
+download.file("http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip" , destfile="DATA/world_shape_file.zip")
+# You now have it in your current working directory, have a look!
+
+# Unzip this file. You can do it with R (as below), or clicking on the object you downloaded.
+system("unzip DATA/world_shape_file.zip")
+#  -- > You now have 4 files. One of these files is a .shp file! (TM_WORLD_BORDERS_SIMPL-0.3.shp)
+
+# Read this shape file with the rgdal library. 
+
+world_spdf <- readOGR( 
+  dsn= paste0(getwd(),"/DATA/world_shape_file/") , 
+  layer="TM_WORLD_BORDERS_SIMPL-0.3",
+  verbose=FALSE
+)
+
+# Clean the data object
+
+world_spdf@data$POP2005[ which(world_spdf@data$POP2005 == 0)] = NA
+world_spdf@data$POP2005 <- as.numeric(as.character(world_spdf@data$POP2005)) / 1000000 %>% round(2)
+
+# Create a color palette for the map:
+mypalette <- colorNumeric( palette="viridis", domain=world_spdf@data$POP2005, na.color="transparent")
+mypalette(c(45,43))
+
+
+```
+
+```{r shiny_app}
+
+
+
+ui <- fluidPage(
+  leafletOutput("map")
+)
+
+server <- function(input, output, session) {
+  
+  output$map <- renderLeaflet({
+    leaflet(world_spdf) %>%
+      addTiles() %>%
+      setView(lng = 0, lat = 10, zoom = 12) %>%
+      addPolygons( fillColor = ~mypalette(POP2005), stroke=FALSE )
+  })
+  
+}
+
+shinyApp(ui, server)
 ```
 
 
@@ -15,33 +75,3 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-
-
-
-
-
-
-
-# Select number of lines to display in table
-
-```{r, echo=FALSE}
-numericInput("rows", "How many cars?", 5)
-
-renderTable({
-  head(cars, input$rows)
-})
-```
-
-# Slider for date
-
-```{r, echo=FALSE}
-sliderInput("bins", "Number of bins:", 30, min = 1, max = 50)
-
-renderPlot({
-  x    = faithful[, 2]  # Old Faithful Geyser data
-  bins = seq(min(x), max(x), length.out = input$bins + 1)
-
-  # draw the histogram with the specified number of bins
-  hist(x, breaks = bins, col = 'darkgray', border = 'white')
-})
-```
