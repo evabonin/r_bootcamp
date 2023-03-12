@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<title></title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.6.0/build/styles/github.min.css">
+<script src="https://cdn.jsdelivr.net/combine/gh/highlightjs/cdn-release@11.6.0/build/highlight.min.js,npm/@xiee/utils/js/load-highlight.js" async></script>
+
+
+
+<style type="text/css">
+body, td {
+  font-family: sans-serif;
+  background-color: white;
+  font-size: 13px;
+}
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+tt, code, pre {
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+a:visited { color: #80007f; }
+pre, img { max-width: 100%; }
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+code[class] { background-color: #F8F8F8; }
+code.language-undefined { background-color: inherit; }
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color:#666;
+  margin:0;
+  padding-left: 1em;
+  border-left: 0.5em #eee solid;
+}
+hr { border: 1px #ddd dashed; }
+.frontmatter { text-align: center; }
+
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    filter:none !important;
+  }
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  a, a:visited { text-decoration: underline; }
+  hr {
+    visibility: hidden;
+    page-break-before: always;
+  }
+  pre, blockquote {
+    padding-right: 1em;
+    page-break-inside: avoid;
+  }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page :left { margin: 15mm 20mm 15mm 10mm; }
+  @page :right { margin: 15mm 10mm 15mm 20mm; }
+  p, h2, h3 { orphans: 3; widows: 3; }
+  h2, h3 { page-break-after: avoid; }
+}
+</style>
+
+
+</head>
+
+<body>
+<div class="include-before">
+
+</div>
+
+<div class="frontmatter">
+<div class="title"><h1></h1></div>
+<div class="author"><h2></h2></div>
+<div class="date"><h3></h3></div>
+</div>
+
+<div class="body">
+<pre><code class="language-r"># Fit regression(s)
+
+# Regression diagnostics (esp. visual)
+
+
+#https://www.datanovia.com/en/blog/how-to-plot-a-smooth-line-using-ggplot2/
+
+
+summary(suicide_final)
+</code></pre>
+<pre><code>##     iso3c             country               year          sex                gdp_pc            edu              sui         
+##  Length:5490        Length:5490        Min.   :2012   Length:5490        Min.   :   261   Min.   : 5.000   Min.   :  0.000  
+##  Class1:labelled    Class1:labelled    1st Qu.:2014   Class1:labelled    1st Qu.:  1670   1st Qu.: 8.000   1st Qu.:  3.700  
+##  Class2:character   Class2:character   Median :2016   Class2:character   Median :  5267   Median : 9.000   Median :  6.900  
+##  Mode  :character   Mode  :character   Mean   :2016   Mode  :character   Mean   : 12701   Mean   : 9.663   Mean   :  9.942  
+##                                        3rd Qu.:2019                      3rd Qu.: 15126   3rd Qu.:11.000   3rd Qu.: 12.200  
+##                                        Max.   :2021                      Max.   :108351   Max.   :17.000   Max.   :147.800  
+##      unem_y           unem_t           pop_t                alc               drug             depr            sh         
+##  Min.   : 0.194   Min.   : 0.050   Min.   :8.767e+04   Min.   :  62.41   Min.   : 74.78   Min.   :1118   Min.   :  7.218  
+##  1st Qu.: 8.080   1st Qu.: 3.703   1st Qu.:2.664e+06   1st Qu.: 315.08   1st Qu.:152.03   1st Qu.:3078   1st Qu.: 24.766  
+##  Median :14.225   Median : 5.904   Median :9.482e+06   Median : 658.09   Median :192.72   Median :3836   Median : 38.268  
+##  Mean   :17.733   Mean   : 8.020   Mean   :4.090e+07   Mean   : 749.94   Mean   :203.65   Mean   :3972   Mean   : 52.959  
+##  3rd Qu.:24.255   3rd Qu.:10.514   3rd Qu.:3.004e+07   3rd Qu.:1081.77   3rd Qu.:237.72   3rd Qu.:4831   3rd Qu.: 74.908  
+##  Max.   :80.762   Max.   :37.901   Max.   :1.412e+09   Max.   :3678.89   Max.   :600.03   Max.   :9268   Max.   :280.768  
+##   continent            region              year1                deaths         
+##  Length:5490        Length:5490        Min.   :2012-01-01   Min.   :0.000e+00  
+##  Class1:labelled    Class1:labelled    1st Qu.:2014-01-01   1st Qu.:9.905e+06  
+##  Class2:character   Class2:character   Median :2016-07-02   Median :3.958e+07  
+##  Mode  :character   Mode  :character   Mean   :2016-07-02   Mean   :2.582e+08  
+##                                        3rd Qu.:2019-01-01   3rd Qu.:1.376e+08  
+##                                        Max.   :2021-01-01   Max.   :1.823e+10
+</code></pre>
+<pre><code class="language-r">library(fixest)
+library(modelsummary)
+library(stats)
+
+library(sjPlot)
+library(sjlabelled)
+</code></pre>
+<pre><code>## 
+## Attaching package: 'sjlabelled'
+</code></pre>
+<pre><code>## The following object is masked from 'package:expss':
+## 
+##     read_spss
+</code></pre>
+<pre><code>## The following object is masked from 'package:forcats':
+## 
+##     as_factor
+</code></pre>
+<pre><code>## The following object is masked from 'package:ggplot2':
+## 
+##     as_label
+</code></pre>
+<pre><code>## The following object is masked from 'package:dplyr':
+## 
+##     as_label
+</code></pre>
+<pre><code class="language-r">library(sjmisc)
+</code></pre>
+<pre><code>## 
+## Attaching package: 'sjmisc'
+</code></pre>
+<pre><code>## The following object is masked from 'package:naniar':
+## 
+##     all_na
+</code></pre>
+<pre><code>## The following objects are masked from 'package:expss':
+## 
+##     add_columns, add_rows, rec
+</code></pre>
+<pre><code>## The following object is masked from 'package:maditr':
+## 
+##     to_long
+</code></pre>
+<pre><code>## The following object is masked from 'package:purrr':
+## 
+##     is_empty
+</code></pre>
+<pre><code>## The following object is masked from 'package:tibble':
+## 
+##     add_case
+</code></pre>
+<pre><code>## The following object is masked from 'package:tidyr':
+## 
+##     replace_na
+</code></pre>
+<pre><code class="language-r">library(ggplot2)
+</code></pre>
+<p>Does the suicide rate increase over time for males or females?</p>
+<pre><code class="language-r"># Simplest model
+reg1 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + year + sex*year)
+
+# Fixed effect by country
+reg2 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + year + sex*year | country)
+
+# Including economic data
+reg3 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + year + sex*year + pop_t + 
+                                                            edu + gdp_pc + unem_y + unem_t | country)
+# Including mental health data
+reg4 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + year + sex*year + pop_t 
+                                                          + edu + gdp_pc + unem_y + unem_t+ 
+                                                            alc + drug + depr + sh | country)
+# 4 plus fixed effect for year
+reg5 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + pop_t 
+                                                          + edu + gdp_pc + unem_y + unem_t+ 
+                                                            alc + drug + depr + sh | country + year,
+                                                          cluster = ~ country)
+# 5 minus vars with zero coefficient
+reg6 &lt;- suicide_final %&gt;% filter(sex != &quot;Both&quot;) %&gt;% feols(sui ~ sex + 
+                                                          edu + unem_y + unem_t+ 
+                                                            alc + drug + depr + sh | country + year,
+                                                          cluster = ~ country)
+</code></pre>
+<p>Overview of models</p>
+<pre><code class="language-r">models &lt;- list(reg1, reg2, reg3, reg4, reg5, reg6)
+
+coefs = c(&quot;sexMale&quot; = &quot;Male&quot;, &quot;year&quot; = &quot;Year&quot;, &quot;sexMale year&quot; = &quot;Male * Year&quot;, &quot;pop_t&quot; = &quot;Total population&quot;, &quot;edu&quot; = &quot;Years compulsory education&quot;, &quot;gdp_pc&quot; = &quot;GDP per capita&quot;, &quot;unem_y&quot; = &quot;Youth unemployment&quot;, &quot;unem_t&quot; = &quot;Total unemployment&quot;, &quot;alc&quot; = &quot;Alcohol misuse&quot;, &quot;drug&quot; = &quot;Drug misuse&quot;, &quot;sh&quot; = &quot;Self harm&quot;)
+
+model_summary &lt;- modelsummary(models,
+                              coef_omit = &quot;Intercept&quot;,
+                              coef_map = coefs,
+                              stars = TRUE)
+</code></pre>
+<p>Showing the coefficients and standard errors for the 5 models</p>
+<pre><code class="language-r">model_plot &lt;- modelplot(models,
+                        coef_map = c(&quot;sexMale&quot; = &quot;Male&quot;)) +
+  guides(color = guide_legend(reverse = TRUE))
+
+model_summary
+</code></pre>
+<table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;">  (1) </th>
+   <th style="text-align:center;">   (2) </th>
+   <th style="text-align:center;">   (3) </th>
+   <th style="text-align:center;">   (4) </th>
+   <th style="text-align:center;">   (5) </th>
+   <th style="text-align:center;">   (6) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:center;"> 290.420 </td>
+   <td style="text-align:center;"> 290.420*** </td>
+   <td style="text-align:center;"> 336.274*** </td>
+   <td style="text-align:center;"> 441.885*** </td>
+   <td style="text-align:center;"> 10.947*** </td>
+   <td style="text-align:center;"> 10.952*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (243.925) </td>
+   <td style="text-align:center;"> (63.452) </td>
+   <td style="text-align:center;"> (81.386) </td>
+   <td style="text-align:center;"> (106.195) </td>
+   <td style="text-align:center;"> (0.772) </td>
+   <td style="text-align:center;"> (0.774) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Year </td>
+   <td style="text-align:center;"> −0.079 </td>
+   <td style="text-align:center;"> −0.079*** </td>
+   <td style="text-align:center;"> −0.049* </td>
+   <td style="text-align:center;"> −0.029 </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (0.086) </td>
+   <td style="text-align:center;"> (0.014) </td>
+   <td style="text-align:center;"> (0.023) </td>
+   <td style="text-align:center;"> (0.026) </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Total population </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Years compulsory education </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> −0.058 </td>
+   <td style="text-align:center;"> −0.058 </td>
+   <td style="text-align:center;"> −0.046 </td>
+   <td style="text-align:center;"> −0.049 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.078) </td>
+   <td style="text-align:center;"> (0.082) </td>
+   <td style="text-align:center;"> (0.085) </td>
+   <td style="text-align:center;"> (0.085) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GDP per capita </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;"> 0.000 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;"> (0.000) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Youth unemployment </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> −0.274 </td>
+   <td style="text-align:center;"> −0.245 </td>
+   <td style="text-align:center;"> −0.240 </td>
+   <td style="text-align:center;"> −0.239 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.186) </td>
+   <td style="text-align:center;"> (0.176) </td>
+   <td style="text-align:center;"> (0.176) </td>
+   <td style="text-align:center;"> (0.175) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Total unemployment </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.756** </td>
+   <td style="text-align:center;"> 0.650* </td>
+   <td style="text-align:center;"> 0.640* </td>
+   <td style="text-align:center;"> 0.639* </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.285) </td>
+   <td style="text-align:center;"> (0.261) </td>
+   <td style="text-align:center;"> (0.260) </td>
+   <td style="text-align:center;"> (0.260) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Alcohol misuse </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.001 </td>
+   <td style="text-align:center;"> 0.001 </td>
+   <td style="text-align:center;"> 0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.001) </td>
+   <td style="text-align:center;"> (0.001) </td>
+   <td style="text-align:center;"> (0.001) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Drug misuse </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.012 </td>
+   <td style="text-align:center;"> 0.010 </td>
+   <td style="text-align:center;"> 0.010 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.013) </td>
+   <td style="text-align:center;"> (0.013) </td>
+   <td style="text-align:center;"> (0.013) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Self harm </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.204*** </td>
+   <td style="text-align:center;"> 0.205*** </td>
+   <td style="text-align:center;"> 0.205*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.036) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Num.Obs. </td>
+   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 3660 </td>
+   <td style="text-align:center;"> 3660 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 </td>
+   <td style="text-align:center;"> 0.209 </td>
+   <td style="text-align:center;"> 0.763 </td>
+   <td style="text-align:center;"> 0.771 </td>
+   <td style="text-align:center;"> 0.789 </td>
+   <td style="text-align:center;"> 0.789 </td>
+   <td style="text-align:center;"> 0.789 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 Adj. </td>
+   <td style="text-align:center;"> 0.208 </td>
+   <td style="text-align:center;"> 0.751 </td>
+   <td style="text-align:center;"> 0.758 </td>
+   <td style="text-align:center;"> 0.778 </td>
+   <td style="text-align:center;"> 0.777 </td>
+   <td style="text-align:center;"> 0.777 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 Within </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.469 </td>
+   <td style="text-align:center;"> 0.486 </td>
+   <td style="text-align:center;"> 0.527 </td>
+   <td style="text-align:center;"> 0.524 </td>
+   <td style="text-align:center;"> 0.524 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 Within Adj. </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.469 </td>
+   <td style="text-align:center;"> 0.485 </td>
+   <td style="text-align:center;"> 0.525 </td>
+   <td style="text-align:center;"> 0.523 </td>
+   <td style="text-align:center;"> 0.523 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> AIC </td>
+   <td style="text-align:center;"> 27609.5 </td>
+   <td style="text-align:center;"> 23554.6 </td>
+   <td style="text-align:center;"> 23446.8 </td>
+   <td style="text-align:center;"> 23148.2 </td>
+   <td style="text-align:center;"> 23172.1 </td>
+   <td style="text-align:center;"> 23168.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BIC </td>
+   <td style="text-align:center;"> 27634.4 </td>
+   <td style="text-align:center;"> 24708.7 </td>
+   <td style="text-align:center;"> 24632.0 </td>
+   <td style="text-align:center;"> 24358.2 </td>
+   <td style="text-align:center;"> 24425.6 </td>
+   <td style="text-align:center;"> 24410.0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RMSE </td>
+   <td style="text-align:center;"> 10.50 </td>
+   <td style="text-align:center;"> 5.74 </td>
+   <td style="text-align:center;"> 5.65 </td>
+   <td style="text-align:center;"> 5.42 </td>
+   <td style="text-align:center;"> 5.43 </td>
+   <td style="text-align:center;"> 5.43 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Std.Errors </td>
+   <td style="text-align:center;"> IID </td>
+   <td style="text-align:center;"> by: country </td>
+   <td style="text-align:center;"> by: country </td>
+   <td style="text-align:center;"> by: country </td>
+   <td style="text-align:center;"> by: country </td>
+   <td style="text-align:center;"> by: country </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FE: country </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> X </td>
+   <td style="text-align:center;"> X </td>
+   <td style="text-align:center;"> X </td>
+   <td style="text-align:center;"> X </td>
+   <td style="text-align:center;"> X </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> FE: year </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> X </td>
+   <td style="text-align:center;"> X </td>
+  </tr>
+</tbody>
+<tfoot><tr><td style="padding: 0; " colspan="100%">
+<sup></sup> + p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
+</table>
+<pre><code class="language-r">model_plot
+</code></pre>
+<p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-4" /></p>
+
+</div>
+
+<div class="include-after">
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/combine/npm/@xiee/utils/js/center-img.min.js" async></script>
+<script>
+
+</script>
+</body>
+
+</html>

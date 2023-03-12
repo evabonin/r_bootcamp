@@ -7,7 +7,7 @@
 
 
 
-# Interactive world map
+# Interactive world map with leaflet and shiny
 
 
 

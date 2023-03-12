@@ -8,7 +8,7 @@
 
 summary(suicide_final)
 
-
+#+ libraries
 library(fixest)
 library(modelsummary)
 library(stats)
@@ -18,8 +18,10 @@ library(sjlabelled)
 library(sjmisc)
 library(ggplot2)
 
-# Does the suicide rate increase over time for males or females?
 
+#' Does the suicide rate increase over time for males or females?
+
+#+ regressions
 # Simplest model
 reg1 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex + year + sex*year)
 
@@ -29,12 +31,10 @@ reg2 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex + year + sex
 # Including economic data
 reg3 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex + year + sex*year + pop_t + 
                                                             edu + gdp_pc + unem_y + unem_t | country)
-
 # Including mental health data
 reg4 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex + year + sex*year + pop_t 
                                                           + edu + gdp_pc + unem_y + unem_t+ 
                                                             alc + drug + depr + sh | country)
-
 # 4 plus fixed effect for year
 reg5 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex + pop_t 
                                                           + edu + gdp_pc + unem_y + unem_t+ 
@@ -46,20 +46,37 @@ reg6 <- suicide_final %>% filter(sex != "Both") %>% feols(sui ~ sex +
                                                             alc + drug + depr + sh | country + year,
                                                           cluster = ~ country)
 
+#' Overview of models
+#+ models1
 
 models <- list(reg1, reg2, reg3, reg4, reg5, reg6)
 
 coefs = c("sexMale" = "Male", "year" = "Year", "sexMale year" = "Male * Year", "pop_t" = "Total population", "edu" = "Years compulsory education", "gdp_pc" = "GDP per capita", "unem_y" = "Youth unemployment", "unem_t" = "Total unemployment", "alc" = "Alcohol misuse", "drug" = "Drug misuse", "sh" = "Self harm")
 
-modelsummary(models,
-             coef_omit = "Intercept",
-             coef_map = coefs,
-             stars = TRUE)
+model_summary <- modelsummary(models,
+                              coef_omit = "Intercept",
+                              coef_map = coefs,
+                              stars = TRUE)
+
+#' Showing the coefficients and standard errors for the 5 models
+
+#+ models2
+
+model_plot <- modelplot(models,
+                        coef_map = c("sexMale" = "Male")) +
+  guides(color = guide_legend(reverse = TRUE))
+
+model_summary
+
+#+ Some text here
+#+ 
+#+ 
+
+#'
+model_plot
 
 
-modelplot(models,
-          coef_map = c("sexMale" = "Male")) +
-          guides(color = guide_legend(reverse = TRUE))
+#+ Conclusions
 
 
 

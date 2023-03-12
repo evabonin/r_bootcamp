@@ -2,14 +2,24 @@
 title: "Suicide and economic and social conditions"
 author: "Eva-Maria Bonin"
 date: "`r Sys.Date()`"
-output: html_document:
-  theme: flatly
-runtime: shiny
+output: html_document
+#runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Select number of lines to display in table
@@ -21,7 +31,6 @@ renderTable({
   head(cars, input$rows)
 })
 ```
-
 
 # Slider for date
 
@@ -36,5 +45,3 @@ renderPlot({
   hist(x, breaks = bins, col = 'darkgray', border = 'white')
 })
 ```
-
-
