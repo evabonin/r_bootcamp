@@ -27,9 +27,11 @@ library(extrafontdb)
 library(ggeffects)
 library(hrbrthemes)
 library(kableExtra)
+library(leaflet)
+library(shiny)
+library(countrycode)
 
 # Define the UI
-```{r, echo=FALSE}
 ui <- fluidPage(
   titlePanel("Suicide Rates by Country"),
   sidebarLayout(
@@ -56,6 +58,12 @@ server <- function(input, output) {
     if (input$sex != "Both") {
       data <- subset(data, sex == input$sex)
     }
+    data$iso3c <- countrycode(data$country, "country.name", "iso3c")
+    lat_long <- data.frame(country = unique(data$country),
+                           iso3c = unique(data$iso3c))
+    lat_long$lat <- countrycode(lat_long$iso3c, "iso3c", "latitude")
+    lat_long$long <- countrycode(lat_long$iso3c, "iso3c", "longitude")
+    data <- merge(data, lat_long, by = "country")
     data
   })
   
@@ -87,4 +95,3 @@ server <- function(input, output) {
 
 # Run the app
 shinyApp(ui = ui, server = server)
-```
